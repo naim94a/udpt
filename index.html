@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="udpt : Open Source UDP torrent tracker">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>udpt</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/naim94a/udpt">View on GitHub</a>
+
+          <h1 id="project_title">udpt</h1>
+          <h2 id="project_tagline">Open Source UDP torrent tracker</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/naim94a/udpt/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/naim94a/udpt/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>
+<a id="the-udpt-project" class="anchor" href="#the-udpt-project" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The UDPT Project</h3>
+
+<p>UDPT is an open source torrent tracker that implements <a href="http://www.bittorrent.org/beps/bep_0015.html">BEP 15</a> of the BitTorrent protocol, written in C/C++. It works with Windows and on Unix-based operating systems.
+Since it runs over the UDP protocol unlike most trackers, it has the benefit of using less bandwidth.</p>
+
+<h3>
+<a id="what-is-a-torrent-tracker" class="anchor" href="#what-is-a-torrent-tracker" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is a "Torrent Tracker"?</h3>
+
+<p>When downloading files using a torrent client, the client must find peers to download parts of the file(s) from. The client asks for peers from a server (the "tracker"). The clients tell the tracker about the torrent that it is downloading or uploading and it's progress. The tracker then responds to clients with IPs of others peers downloading the same file(s), allowing peers to download/upload files.</p>
+
+<h3>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h3>
+
+<ul>
+<li>UDP tracking protocol</li>
+<li>SQLite3 database, it support In-memory (using the <code>:memory:</code> file)</li>
+<li>Dynamic Tracker</li>
+<li>HTTP API for static trackers</li>
+<li>Logging</li>
+<li>Windows Service / Unix daemon support</li>
+<li>Simple ini-like configuration file (which can be empty to load defaults)
+For more info about UDPT, check the <a href="https://github.com/naim94a/udpt/wiki">Wiki</a>.</li>
+</ul>
+
+<h4>
+<a id="license--third-party-libraries" class="anchor" href="#license--third-party-libraries" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License &amp; third party libraries</h4>
+
+<p>UDPT is released under the GPLv3 license.
+Third partly libraries include:</p>
+
+<ul>
+<li>SQLite3, which is public-domain; </li>
+<li>Boost which is released under the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost License</a>.</li>
+</ul>
+
+<h4>
+<a id="issues--feature-requests" class="anchor" href="#issues--feature-requests" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Issues &amp; feature requests</h4>
+
+<p>Please submit bugs &amp; feature requests at UDPT's GitHub issues page: <a href="https://github.com/naim94a/udpt/issues">https://github.com/naim94a/udpt/issues</a>.</p>
+
+<h4>
+<a id="authorscontributing" class="anchor" href="#authorscontributing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors/Contributing</h4>
+
+<p>On November 20th, 2012 the development started by Naim A. (<a href="https://github.com/naim94a" class="user-mention">@naim94a</a>). If you would like to contribute, you can submit a pull-request on GitHub and it may get to be part of the UDPT project (After passing a good CR).</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">udpt maintained by <a href="https://github.com/naim94a">naim94a</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
