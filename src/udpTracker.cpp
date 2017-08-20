@@ -447,7 +447,7 @@ namespace UDPT
 		while (true)
 		{
 			// peek into the first 12 bytes of data; determine if connection request or announce request.
-			int r = ::recvfrom(usi->m_sock, (char*)tmpBuff, UDP_BUFFER_SIZE, 0, (SOCKADDR*)&remoteAddr, &addrSz);
+			int r = ::recvfrom(usi->m_sock, (char*)tmpBuff, UDP_BUFFER_SIZE, 0, (SOCKADDR*)&remoteAddr, addrSz);
 			if (r <= 0)
 			{
 				boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
