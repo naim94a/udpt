@@ -153,8 +153,8 @@ namespace UDPT
 		std::shared_ptr<UDPT::Data::DatabaseDriver> m_conn;
 
 	private:
-		SOCKET m_sock;
-		SOCKADDR_IN m_localEndpoint;
+		int SOCKET m_sock;
+		struct SOCKADDR_IN m_localEndpoint;
 		uint16_t m_port;
 		uint8_t m_threadCount;
 		bool m_isDynamic;

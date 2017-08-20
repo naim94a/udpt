@@ -17,10 +17,9 @@
 #		along with UDPT.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-objects = main.o udpTracker.o database.o driver_sqlite.o \
-	tools.o httpserver.o webapp.o tracker.o
+objects = main.o udpTracker.o database.o driver_sqlite.o tools.o httpserver.o webapp.o tracker.o
 target = udpt
-CXXFLAGS = -DBOOST_LOG_DYN_LINK
+CXXFLAGS = -DBOOST_LOG_DYN_LINK -I/usr/local/include/
 
 %.o: src/%.c
 	$(CC) -c -o $@ $< $(CFLAGS)
