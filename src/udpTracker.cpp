@@ -79,6 +79,9 @@ namespace UDPT
 #if defined(linux)
 			timeval timeout = { 0 };
 			timeout.tv_sec = 5;
+#if defined(bsd)
+			timeval timeout = { 0 };
+			timeout.tv_sec = 5;
 #elif defined(WIN32)
 			DWORD timeout = 5000;
 #else
