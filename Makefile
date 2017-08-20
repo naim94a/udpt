@@ -17,10 +17,9 @@
 #		along with UDPT.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-objects = main.o udpTracker.o database.o driver_sqlite.o \
-	tools.o httpserver.o webapp.o tracker.o
+objects = main.o udpTracker.o database.o driver_sqlite.o tools.o httpserver.o webapp.o tracker.o
 target = udpt
-CXXFLAGS = -DBOOST_LOG_DYN_LINK
+CXXFLAGS = -DBOOST_LOG_DYN_LINK -I/usr/local/include/
 
 %.o: src/%.c
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -34,7 +33,7 @@ all: $(target)
 	
 $(target): $(objects)
 	@echo Linking...
-	$(CXX) -O3 -o $(target) $(objects) $(LDFLAGS) -lboost_program_options -lsqlite3 -lpthread -lboost_thread -lboost_system -lboost_log
+	$(CXX) -O3 -o $(target) $(objects) $(LDFLAGS) -L/usr/local/lib -lboost_program_options -lsqlite3 -lpthread -lboost_thread -lboost_system -lboost_log
 	@echo Done.
 clean:
 	@echo Cleaning Up...

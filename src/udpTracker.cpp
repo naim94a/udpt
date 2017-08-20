@@ -79,6 +79,9 @@ namespace UDPT
 #if defined(linux)
 			timeval timeout = { 0 };
 			timeout.tv_sec = 5;
+#elif defined(bsd)
+			timeval timeout = { 0 };
+			timeout.tv_sec = 5;
 #elif defined(WIN32)
 			DWORD timeout = 5000;
 #else
@@ -434,6 +437,8 @@ namespace UDPT
 
 #ifdef linux
 		socklen_t addrSz;
+#elif defined (bsd)
+		uint32_t addrSz;
 #else
 		int addrSz;
 #endif

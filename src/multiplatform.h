@@ -26,6 +26,8 @@
 #define WIN32
 #elif defined (__APPLE__) || defined (__CYGWIN__)
 #define linux
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+#define bsd
 #endif
 
 #define VERSION "1.0.2-dev"
@@ -40,6 +42,17 @@
 #include <sys/stat.h>
 #include <netinet/ip.h>
 #include <netinet/in.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <pthread.h>
+#include <fcntl.h>
+#include <arpa/inet.h>
+#elif defined (bsd)
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <netinet/ip.h>
 #include <unistd.h>
 #include <netdb.h>
 #include <pthread.h>
@@ -65,7 +78,9 @@ typedef pthread_t HANDLE;
 #define PLATFORM "Windows"
 #elif defined  (__APPLE__)
 #define PLATFORM "Apple"
-#elif defined (__CYGWIN__)
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+#define PLATFORM "BSD"
+#elif defined (__C__)
 #define PLATFORM "Cygwin"
 #else
 #define PLATFORM "Linux"

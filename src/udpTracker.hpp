@@ -36,8 +36,8 @@
 
 #include "tools.h"
 #include "exceptions.h"
-#include "multiplatform.h"
 #include "db/driver_sqlite.hpp"
+#include "multiplatform.h"
 
 #define UDPT_DYNAMIC			(0x01)	// Track Any info_hash?
 #define UDPT_ALLOW_REMOTE_IP	(0x02)	// Allow client's to send other IPs?
