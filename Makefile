@@ -33,7 +33,7 @@ all: $(target)
 	
 $(target): $(objects)
 	@echo Linking...
-	$(CXX) -O3 -o $(target) $(objects) $(LDFLAGS) --verbose -L/usr/local/lib -lboost_program_options -lsqlite3 -lpthread -lboost_thread -lboost_system -lboost_log
+	$(CXX) -O3 -o $(target) $(objects) $(LDFLAGS) -L/usr/local/lib -lboost_program_options -lsqlite3 -lpthread -lboost_thread -lboost_system -lboost_log
 	@echo Done.
 clean:
 	@echo Cleaning Up...
