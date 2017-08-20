@@ -49,10 +49,10 @@
 #include <arpa/inet.h>
 #elif defined (bsd)
 #include <sys/types.h>
+#include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <netinet/ip.h>
-#include <netinet/in.h>
 #include <unistd.h>
 #include <netdb.h>
 #include <pthread.h>
