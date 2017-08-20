@@ -19,13 +19,13 @@
 
 #pragma once
 
-#include "../multiplatform.h"
 #include <stdint.h>
 #include <map>
 #include <string>
 #include <sstream>
 #include <list>
 #include <boost/program_options.hpp>
+#include "../multiplatform.h"
 using namespace std;
 
 #define REQUEST_BUFFER_SIZE 2048
