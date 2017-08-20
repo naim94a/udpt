@@ -34,9 +34,9 @@
 #include <boost/log/trivial.hpp>
 #include <boost/log/sources/severity_channel_logger.hpp>
 
+#include "multiplatform.h"
 #include "tools.h"
 #include "exceptions.h"
-#include "multiplatform.h"
 #include "db/driver_sqlite.hpp"
 
 #define UDPT_DYNAMIC			(0x01)	// Track Any info_hash?
@@ -153,8 +153,8 @@ namespace UDPT
 		std::shared_ptr<UDPT::Data::DatabaseDriver> m_conn;
 
 	private:
-		int SOCKET m_sock;
-		struct SOCKADDR_IN m_localEndpoint;
+		SOCKET m_sock;
+		SOCKADDR_IN m_localEndpoint;
 		uint16_t m_port;
 		uint8_t m_threadCount;
 		bool m_isDynamic;
