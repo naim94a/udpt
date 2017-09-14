@@ -1,7 +1,7 @@
 title: udpt
 description: Open Source UDP torrent tracker
 google_analytics: UA-11289087-19
-show_downloads: true
+show_downloads: false
 theme: jekyll-theme-slate
 
 gems:
