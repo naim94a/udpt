@@ -33,27 +33,27 @@ using namespace UDPT::Data;
 
 namespace UDPT
 {
-	namespace Server
-	{
-		class WebApp
-		{
-		public:
-			WebApp(std::shared_ptr<HTTPServer> , DatabaseDriver *, const boost::program_options::variables_map& conf);
-			virtual ~WebApp();
-			void deploy ();
-			
+    namespace Server
+    {
+        class WebApp
+        {
+        public:
+            WebApp(std::shared_ptr<HTTPServer> , DatabaseDriver *, const boost::program_options::variables_map& conf);
+            virtual ~WebApp();
+            void deploy ();
 
-		private:
-			std::shared_ptr<HTTPServer> m_server;
-			UDPT::Data::DatabaseDriver *db;
-			const boost::program_options::variables_map& m_conf;
 
-			static void handleRoot (HTTPServer*,HTTPServer::Request*, HTTPServer::Response*);
-			static void handleAnnounce (HTTPServer*,HTTPServer::Request*, HTTPServer::Response*);
-			static void handleAPI (HTTPServer*,HTTPServer::Request*, HTTPServer::Response*);
+        private:
+            std::shared_ptr<HTTPServer> m_server;
+            UDPT::Data::DatabaseDriver *db;
+            const boost::program_options::variables_map& m_conf;
 
-			void doAddTorrent (HTTPServer::Request*, HTTPServer::Response*);
-			void doRemoveTorrent (HTTPServer::Request*, HTTPServer::Response*);
-		};
-	};
+            static void handleRoot (HTTPServer*,HTTPServer::Request*, HTTPServer::Response*);
+            static void handleAnnounce (HTTPServer*,HTTPServer::Request*, HTTPServer::Response*);
+            static void handleAPI (HTTPServer*,HTTPServer::Request*, HTTPServer::Response*);
+
+            void doAddTorrent (HTTPServer::Request*, HTTPServer::Response*);
+            void doRemoveTorrent (HTTPServer::Request*, HTTPServer::Response*);
+        };
+    };
 };
