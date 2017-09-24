@@ -20,16 +20,18 @@
 #include <sstream>
 #include <chrono>
 #include <cstring>
+#include <iostream>
 
 namespace UDPT {
     namespace Logging {
 
-        Logger::Logger() {
-
+        Logger::Logger() : m_cleaningUp(false), m_workerThread(Logger::worker, this), m_minLogLevel(Severity::FATAL) {
         }
 
         Logger::~Logger() {
             try {
+                m_cleaningUp = true;
+                m_workerThread.join();
                 flush();
             } catch (...) {
                 // can't do much here... this is a logging class...
@@ -43,6 +45,10 @@ namespace UDPT {
         }
 
         void Logger::log(Severity severity, const std::string& channel, const std::string& message) {
+            if (severity < m_minLogLevel) {
+                return;
+            }
+
             m_queue.Push(LogEntry{
                     .when=std::chrono::system_clock::now(),
                     .severity=severity,
@@ -52,6 +58,7 @@ namespace UDPT {
         }
 
         void Logger::addStream(std::ostream *stream, Severity severity) {
+            m_minLogLevel = m_minLogLevel > severity ? severity : m_minLogLevel;
             m_outputStreams.push_back(std::pair<std::ostream*, Severity>(stream, severity));
         }
 
@@ -95,14 +102,28 @@ namespace UDPT {
                     }
 
                     std::ostream& current_stream = *(it->first);
-                    current_stream << result_log << std::endl;
+                    try {
+                        current_stream << result_log << std::endl;
+                    } catch (...) {
+                        // do nothing.
+                    }
                 }
             }
 
             for (std::vector<std::pair<std::ostream*, Severity>>::const_iterator it = m_outputStreams.begin(); it != m_outputStreams.end(); ++it) {
-                it->first->flush();
+                try {
+                    it->first->flush();
+                } catch (...) {
+                    // do nothing.
+                }
             }
         }
 
+        void Logger::worker(Logger *me) {
+            while (!me->m_cleaningUp) {
+                me->flush();
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+        }
     }
 }

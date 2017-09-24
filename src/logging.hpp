@@ -22,6 +22,18 @@
 #include <thread>
 #include "MessageQueue.hpp"
 
+#define LOG(severity, channel, message) \
+    {\
+        std::stringstream __sstream; \
+        __sstream << message; \
+        UDPT::Logging::Logger::getLogger().log(severity, channel, __sstream.str()); \
+    }
+#define LOG_INFO(channel, message) LOG(UDPT::Logging::Severity::INFO, channel, message)
+#define LOG_DEBUG(channel, message) LOG(UDPT::Logging::Severity::DEBUG, channel, message)
+#define LOG_WARN(channel, message) LOG(UDPT::Logging::Severity::WARNING, channel, message)
+#define LOG_ERR(channel, message) LOG(UDPT::Logging::Severity::ERROR, channel, message)
+#define LOG_FATAL(channel, message) LOG(UDPT::Logging::Severity::FATAL, channel, message)
+
 namespace UDPT {
     namespace Logging {
 
@@ -35,10 +47,10 @@ namespace UDPT {
         };
 
         struct LogEntry {
-            std::chrono::time_point<std::chrono::system_clock> when;
+            const std::chrono::time_point<std::chrono::system_clock> when;
             Severity severity;
-            const std::string& channel;
-            std::string message;
+            const std::string channel;
+            const std::string message;
         };
 
         class Logger {
@@ -55,8 +67,13 @@ namespace UDPT {
             Logger();
             virtual ~Logger();
 
+            static void worker(Logger*);
+
             std::vector<std::pair<std::ostream*, UDPT::Logging::Severity>> m_outputStreams;
             UDPT::Utils::MessageQueue<struct LogEntry> m_queue;
+            std::thread m_workerThread;
+            bool m_cleaningUp;
+            Severity m_minLogLevel;
         };
 
     }
