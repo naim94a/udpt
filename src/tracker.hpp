@@ -52,5 +52,8 @@ namespace UDPT
         std::shared_ptr<UDPT::Server::WebApp> m_webApp;
 
         Tracker();
+
+        void setupLogging(const boost::program_options::variables_map& va_map);
+        std::ostream *m_logStream;
     };
 }

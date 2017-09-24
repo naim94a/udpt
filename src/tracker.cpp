@@ -16,20 +16,33 @@
 *		You should have received a copy of the GNU General Public License
 *		along with UDPT.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <iostream>
+#include <fstream>
 #include "tracker.hpp"
+#include "logging.hpp"
 
 namespace UDPT
 {
-    Tracker::Tracker()
+    Tracker::Tracker() : m_logStream(nullptr)
     {
     }
 
     Tracker::~Tracker()
     {
+        try {
+            if (nullptr != m_logStream) {
+                m_logStream->flush();
+                delete m_logStream;
+                m_logStream = nullptr;
+            }
+        } catch (...) {
+
+        }
     }
 
     void Tracker::stop()
     {
+        LOG_INFO("tracker", "Requesting components to terminate...");
         m_udpTracker->stop();
         wait();
 
@@ -45,6 +58,9 @@ namespace UDPT
 
     void Tracker::start(const boost::program_options::variables_map& conf)
     {
+        setupLogging(conf);
+        LOG_INFO("core", "Initializing...");
+
         m_udpTracker = std::shared_ptr<UDPTracker>(new UDPTracker(conf));
 
         if (conf["apiserver.enable"].as<bool>())
@@ -84,7 +100,7 @@ namespace UDPT
             ("apiserver.port", boost::program_options::value<unsigned short>()->default_value(6969), "TCP port to listen on")
 
             ("logging.filename", boost::program_options::value<std::string>()->default_value("/var/log/udpt.log"), "file to write logs to")
-            ("logging.level", boost::program_options::value<std::string>()->default_value("warning"), "log level (fatal/error/warning/info/debug/trace)")
+            ("logging.level", boost::program_options::value<std::string>()->default_value("warning"), "log level (fatal/error/warning/info/debug)")
 
 #ifdef linux
             ("daemon.chdir", boost::program_options::value<std::string>()->default_value("/"), "home directory for daemon")
@@ -95,5 +111,44 @@ namespace UDPT
             ;
 
         return configOptions;
+    }
+
+    void Tracker::setupLogging(const boost::program_options::variables_map& va_map) {
+        Logging::Logger& logger = Logging::Logger::getLogger();
+
+        logger.addStream(&std::cerr, Logging::Severity::FATAL);
+
+        Logging::Severity severity;
+        std::string severity_text = va_map["logging.level"].as<std::string>();
+        std::transform(severity_text.begin(), severity_text.end(), severity_text.begin(), ::tolower);
+
+        if (severity_text == "fatal") {
+            severity = Logging::Severity::FATAL;
+        } else if (severity_text == "error") {
+            severity = Logging::Severity::ERROR;
+        } else if (severity_text == "warning") {
+            severity = Logging::Severity::WARNING;
+        } else if (severity_text == "info") {
+            severity = Logging::Severity::INFO;
+        } else if (severity_text == "debug") {
+            severity = Logging::Severity::DEBUG;
+        } else {
+            severity = Logging::Severity::UNSET;
+        }
+
+        const std::string& logFileName = va_map["logging.filename"].as<std::string>();
+        Logging::Severity real_severity = (severity == Logging::Severity::UNSET ? Logging::Severity::INFO : severity);
+        if (logFileName.length() == 0 || logFileName == "--") {
+            logger.addStream(&std::cerr, real_severity);
+        } else {
+            m_logStream = new ofstream(logFileName, std::ios::app | std::ios::out);
+            logger.addStream(m_logStream, real_severity);
+        }
+
+        if (severity != real_severity) {
+            LOG_WARN("core", "'" << severity_text << "' is invalid, log level set to " << real_severity);
+        }
+
+        logger.flush();
     }
 }
