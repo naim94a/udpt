@@ -72,7 +72,11 @@ void _close_wsa()
 }
 #endif
 
+#ifdef TEST
+int real_main(int argc, char *argv[])
+#else
 int main(int argc, char *argv[])
+#endif
 {
 #ifdef WIN32
     WSADATA wsadata;
