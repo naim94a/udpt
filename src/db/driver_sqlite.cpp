@@ -26,6 +26,7 @@
 #include <cassert>
 #include <cstring> // memcpy
 #include "../multiplatform.h"
+#include "../logging.hpp"
 
 using namespace std;
 
@@ -86,6 +87,7 @@ namespace UDPT
             r = sqlite3_open(filename.c_str(), &this->db);
             if (r != SQLITE_OK)
             {
+                LOG_FATAL("db-sqlite", "Failed to connect DB. sqlite returned " << r);
                 sqlite3_close(this->db);
                 throw DatabaseException (DatabaseException::E_CONNECTION_FAILURE);
             }
@@ -97,6 +99,7 @@ namespace UDPT
         void SQLite3Driver::doSetup()
         {
             char *eMsg = NULL;
+            LOG_INFO("db-sqlite", "Setting up database...");
             // for quicker stats.
             sqlite3_exec(this->db, "CREATE TABLE stats ("
                     "info_hash blob(20) UNIQUE,"
@@ -282,17 +285,26 @@ namespace UDPT
 
         void SQLite3Driver::cleanup()
         {
+            LOG_INFO("db-sqlite", "Cleaning up...");
             int exp = time (NULL) - 7200;	// 2 hours,  expired.
+            int r = 0;
 
             // drop all peers with no activity for 2 hours.
             sqlite3_stmt *getTables;
             // torrent table names: t<hex-of-sha-1>
-            sqlite3_prepare(this->db, "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 't________________________________________'", -1, &getTables, NULL);
+            r = sqlite3_prepare(this->db, "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 't________________________________________'", -1, &getTables, NULL);
+            if (r != SQLITE_OK) {
+                LOG_ERR("db-sqlite", "Failed fetch tables from DB for cleanup.");
+                return;
+            }
 
             uint8_t buff [20];
             sqlite3_stmt *updateStats;
-            assert (sqlite3_prepare(this->db, "REPLACE INTO stats (info_hash,seeders,leechers,last_mod) VALUES (?,?,?,?)", -1, &updateStats, NULL) == SQLITE_OK);
-
+            r = sqlite3_prepare(this->db, "REPLACE INTO stats (info_hash,seeders,leechers,last_mod) VALUES (?,?,?,?)", -1, &updateStats, NULL);
+            if (r != SQLITE_OK) {
+                LOG_ERR("db-sqlite", "Failed to prepare update stats query.");
+                return;
+            }
 
             while (sqlite3_step(getTables) == SQLITE_ROW)
             {
@@ -300,18 +312,23 @@ namespace UDPT
                 stringstream sStr;
                 sStr << "DELETE FROM " << tblN << " WHERE last_seen<" << exp;
 
-                assert (sqlite3_exec(this->db, sStr.str().c_str(), NULL, NULL, NULL) == SQLITE_OK);
+                r = sqlite3_exec(this->db, sStr.str().c_str(), NULL, NULL, NULL);
+                if (r != SQLITE_OK) {
+                    LOG_ERR("db-sqlite", "Failed to execute cleanup for table '" << tblN << "'.");
+                    continue;
+                }
 
                 sStr.str (string());
                 sStr << "SELECT left,COUNT(*) FROM " << tblN << " GROUP BY left==0";
 
                 sqlite3_stmt *collectStats;
 
-                sqlite3_prepare(this->db, sStr.str().c_str(), sStr.str().length(), &collectStats, NULL);
+                r = sqlite3_prepare(this->db, sStr.str().c_str(), sStr.str().length(), &collectStats, NULL);
 
-                if (sqlite3_errcode(this->db) != SQLITE_OK)
+                if (r != SQLITE_OK)
                 {
-                    // TODO: Log this error
+                    LOG_ERR("db-sqlite", "Failed while trying to prepare stats query for '" << tblN << "', sqlite returned " << r);
+                    continue;
                 }
 
                 int seeders = 0, leechers = 0;
@@ -336,8 +353,7 @@ namespace UDPT
             sqlite3_finalize(getTables);
         }
 
-        bool SQLite3Driver::removeTorrent(uint8_t info_hash[20])
-        {
+        bool SQLite3Driver::removeTorrent(uint8_t info_hash[20]) {
             // if non-dynamic, remove from table
             sqlite3_stmt *stmt;
             sqlite3_prepare(this->db, "DELETE FROM torrents WHERE info_hash=?", -1, &stmt, NULL);
@@ -367,8 +383,7 @@ namespace UDPT
             return true;
         }
 
-        bool SQLite3Driver::removePeer(uint8_t peer_id [20], uint8_t info_hash [20], uint32_t ip, uint16_t port)
-        {
+        bool SQLite3Driver::removePeer(uint8_t peer_id [20], uint8_t info_hash [20], uint32_t ip, uint16_t port) {
             string sql;
             char xHash [50];
             sqlite3_stmt *stmt;
@@ -392,32 +407,28 @@ namespace UDPT
             return true;
         }
 
-    static uint64_t _genCiD (uint32_t ip, uint16_t port)
-    {
-        uint64_t x;
-        x = (time(NULL) / 3600) * port;	// x will probably overload.
-        x = (ip ^ port);
-        x <<= 16;
-        x |= (~port);
-        return x;
-    }
+        static uint64_t _genCiD (uint32_t ip, uint16_t port) {
+            uint64_t x;
+            x = (time(NULL) / 3600) * port;	// x will probably overload.
+            x = (ip ^ port);
+            x <<= 16;
+            x |= (~port);
+            return x;
+        }
 
-        bool SQLite3Driver::genConnectionId (uint64_t *connectionId, uint32_t ip, uint16_t port)
-        {
+        bool SQLite3Driver::genConnectionId (uint64_t *connectionId, uint32_t ip, uint16_t port) {
             *connectionId = _genCiD(ip, port);
             return true;
         }
 
-        bool SQLite3Driver::verifyConnectionId(uint64_t cId, uint32_t ip, uint16_t port)
-        {
+        bool SQLite3Driver::verifyConnectionId(uint64_t cId, uint32_t ip, uint16_t port) {
             if (cId == _genCiD(ip, port))
                 return true;
             else
                 return false;
         }
 
-        SQLite3Driver::~SQLite3Driver()
-        {
+        SQLite3Driver::~SQLite3Driver() {
             sqlite3_close(this->db);
         }
     };
