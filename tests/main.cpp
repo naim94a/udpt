@@ -44,8 +44,8 @@ protected:
         }
     }
 
-    UDPT::Data::SQLite3Driver *driver;
     boost::program_options::variables_map va_map;
+    UDPT::Data::SQLite3Driver *driver;
 };
 
 
