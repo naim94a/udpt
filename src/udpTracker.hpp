@@ -31,6 +31,8 @@
 
 #include <thread>
 #include <boost/program_options.hpp>
+#include <mutex>
+#include <condition_variable>
 
 #include "tools.h"
 #include "exceptions.h"
@@ -158,10 +160,13 @@ namespace UDPT
         bool m_isDynamic;
         bool m_allowRemotes;
         bool m_allowIANA_IPs;
-        std::atomic_bool m_shouldRun;
         std::vector<std::thread> m_threads;
         uint32_t m_announceInterval;
         uint32_t m_cleanupInterval;
+        std::atomic_bool m_shouldRun;
+
+        std::mutex m_maintenanceMutex;
+        std::condition_variable m_maintenanceCondition;
 
         const boost::program_options::variables_map& m_conf;
 

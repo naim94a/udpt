@@ -44,11 +44,10 @@ namespace UDPT
     {
         LOG_INFO("tracker", "Requesting components to terminate...");
         m_udpTracker->stop();
-        wait();
 
+        // cause other components to destruct.
         m_apiSrv = nullptr;
         m_webApp = nullptr;
-        m_udpTracker = nullptr;
     }
 
     void Tracker::wait()
@@ -148,7 +147,5 @@ namespace UDPT
         if (severity != real_severity) {
             LOG_WARN("core", "'" << severity_text << "' is invalid, log level set to " << real_severity);
         }
-
-        logger.flush();
     }
 }

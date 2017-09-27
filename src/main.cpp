@@ -32,14 +32,18 @@
 #include "http/webapp.hpp"
 #include "tracker.hpp"
 #include "service.hpp"
+#include "logging.hpp"
 
-static void _signal_handler(int sig)
+extern "C" void _signal_handler(int sig)
 {
-    switch (sig)
-    {
+    switch (sig) {
         case SIGTERM:
+        case SIGQUIT:
+        case SIGINT: {
+            LOG_INFO("core", "Received signal " << sig << ", requesting to stop tracker");
             UDPT::Tracker::getInstance().stop();
             break;
+        }
     }
 }
 
@@ -153,6 +157,7 @@ int main(int argc, char *argv[])
         daemonize(var_map);
     }
     ::signal(SIGTERM, _signal_handler);
+    ::signal(SIGINT, _signal_handler);
 #endif
 #ifdef WIN32 
     UDPT::Service svc(var_map);
@@ -222,6 +227,8 @@ int main(int argc, char *argv[])
         std::cerr << "UDPT exception: (" << ex.getErrorCode() << "): " << ex.what();
         return -1;
     }
+
+    LOG_INFO("core", "UDPT terminated.");
 
     return 0;
 }

@@ -27,8 +27,7 @@ using namespace UDPT::Data;
 
 namespace UDPT
 {
-    UDPTracker::UDPTracker(const boost::program_options::variables_map& conf) : m_conf(conf), m_shouldRun(true)
-    {
+    UDPTracker::UDPTracker(const boost::program_options::variables_map& conf) : m_conf(conf) {
         this->m_allowRemotes = conf["tracker.allow_remotes"].as<bool>();
         this->m_allowIANA_IPs = conf["tracker.allow_iana_ips"].as<bool>();
         this->m_isDynamic = conf["tracker.is_dynamic"].as<bool>();
@@ -45,13 +44,10 @@ namespace UDPT
         this->m_conn = std::shared_ptr<DatabaseDriver>(new Data::SQLite3Driver(m_conf, this->m_isDynamic));
     }
 
-    UDPTracker::~UDPTracker()
-    {
-        stop();
+    UDPTracker::~UDPTracker() {
     }
 
-    void UDPTracker::start()
-    {
+    void UDPTracker::start() {
         SOCKET sock;
         int r,		// saves results
             i,		// loop index
@@ -100,11 +96,11 @@ namespace UDPT
 
         LOG_INFO("udp-tracker", "Tracker bound to " << inet_ntoa(this->m_localEndpoint.sin_addr));
 
-
         // create maintainer thread.
         m_threads.push_back(std::thread(UDPTracker::_maintainance_start, this));
         LOG_INFO("udp-tracker", "Started maintenance thread @" << m_threads.back().get_id());
 
+        m_shouldRun = true;
         for (i = 1;i < this->m_threadCount; i++)
         {
             m_threads.push_back(std::thread(UDPTracker::_thread_start, this));
@@ -112,32 +108,36 @@ namespace UDPT
         }
     }
 
-    void UDPTracker::stop()
-    {
+    void UDPTracker::stop() {
+        // tell workers to stop running...
+        m_shouldRun = false;
+
+        // stop maintenance thread's sleep...
+        m_maintenanceCondition.notify_one();
+    }
+
+    /**
+     * @brief blocks until all threads die.
+     * @note This method should be called only once, preferably by the main thread.
+     * **/
+    void UDPTracker::wait() {
+        LOG_INFO("udp-tracker", "Waiting for threads to terminate...");
+
+        for (std::vector<std::thread>::iterator it = m_threads.begin(); it != m_threads.end(); ++it)
+        {
+            it->join();
+        }
+
+        LOG_INFO("udp-tracker", "UDP Tracker terminated");
 
 #ifdef linux
         ::close(m_sock);
 #elif defined (WIN32)
         ::closesocket(m_sock);
 #endif
-
-        this->m_shouldRun = false;
-
-        LOG_INFO("udp-tracker", "Waiting for threads to terminate...");
-        wait();
     }
 
-    void UDPTracker::wait()
-    {
-        for (std::vector<std::thread>::iterator it = m_threads.begin(); it != m_threads.end(); ++it)
-        {
-            it->join();
-        }
-        LOG_INFO("udp-tracker", "UDP Tracker terminated");
-    }
-
-    int UDPTracker::sendError(UDPTracker* usi, SOCKADDR_IN* remote, uint32_t transactionID, const std::string &msg)
-    {
+    int UDPTracker::sendError(UDPTracker* usi, SOCKADDR_IN* remote, uint32_t transactionID, const std::string &msg) {
         struct udp_error_response error;
         int msg_sz,	// message size to send.
             i;		// copy loop
@@ -166,8 +166,7 @@ namespace UDPT
         return 0;
     }
 
-    int UDPTracker::handleConnection(UDPTracker *usi, SOCKADDR_IN *remote, char *data)
-    {
+    int UDPTracker::handleConnection(UDPTracker *usi, SOCKADDR_IN *remote, char *data) {
         ConnectionRequest *req = reinterpret_cast<ConnectionRequest*>(data);
         ConnectionResponse resp;
 
@@ -186,8 +185,7 @@ namespace UDPT
         return 0;
     }
 
-    int UDPTracker::handleAnnounce(UDPTracker *usi, SOCKADDR_IN *remote, char *data)
-    {
+    int UDPTracker::handleAnnounce(UDPTracker *usi, SOCKADDR_IN *remote, char *data) {
         AnnounceRequest *req;
         AnnounceResponse *resp;
         int q,		// peer counts
@@ -305,8 +303,7 @@ namespace UDPT
         return 0;
     }
 
-    int UDPTracker::handleScrape(UDPTracker *usi, SOCKADDR_IN *remote, char *data, int len)
-    {
+    int UDPTracker::handleScrape(UDPTracker *usi, SOCKADDR_IN *remote, char *data, int len) {
         ScrapeRequest *sR = reinterpret_cast<ScrapeRequest*>(data);
         int v,	// validation helper
             c,	// torrent counter
@@ -371,16 +368,14 @@ namespace UDPT
         return 0;
     }
 
-    int UDPTracker::isIANAIP(uint32_t ip)
-    {
+    int UDPTracker::isIANAIP(uint32_t ip) {
         uint8_t x = (ip % 256);
         if (x == 0 || x == 10 || x == 127 || x >= 224)
             return 1;
         return 0;
     }
 
-    int UDPTracker::resolveRequest(UDPTracker *usi, SOCKADDR_IN *remote, char *data, int r)
-    {
+    int UDPTracker::resolveRequest(UDPTracker *usi, SOCKADDR_IN *remote, char *data, int r) {
         ConnectionRequest* cR = reinterpret_cast<ConnectionRequest*>(data);
         uint32_t action;
 
@@ -408,8 +403,7 @@ namespace UDPT
         }
     }
 
-    void UDPTracker::_thread_start(UDPTracker *usi)
-    {
+    void UDPTracker::_thread_start(UDPTracker *usi) {
         SOCKADDR_IN remoteAddr;
         char tmpBuff[UDP_BUFFER_SIZE];
 
@@ -421,8 +415,7 @@ namespace UDPT
 
         addrSz = sizeof(SOCKADDR_IN);
 
-
-        while (true)
+        while (usi->m_shouldRun)
         {
             // peek into the first 12 bytes of data; determine if connection request or announce request.
             int r = ::recvfrom(usi->m_sock, (char*)tmpBuff, UDP_BUFFER_SIZE, 0, (SOCKADDR*)&remoteAddr, &addrSz);
@@ -434,16 +427,24 @@ namespace UDPT
 
             UDPTracker::resolveRequest(usi, &remoteAddr, tmpBuff, r);
         }
+
+        LOG_INFO("udp-tracker", "worker " << std::this_thread::get_id() << " exited.");
     }
 
-    void UDPTracker::_maintainance_start(UDPTracker* usi)
-    {
-        while (usi->m_shouldRun)
+    void UDPTracker::_maintainance_start(UDPTracker* usi) {
+        std::unique_lock<std::mutex> lk (usi->m_maintenanceMutex);
+
+        while (true)
         {
-            std::this_thread::sleep_for(std::chrono::seconds(usi->m_cleanupInterval));
+            if (std::cv_status::no_timeout == usi->m_maintenanceCondition.wait_for(lk, std::chrono::seconds(usi->m_cleanupInterval))) {
+                break;
+            }
+
             LOG_INFO("udp-tracker", "Maintenance running...");
             usi->m_conn->cleanup();
         }
-    }
 
+        lk.unlock();
+        LOG_INFO("udp-tracker", "Maintenance thread " << std::this_thread::get_id() << " existed.");
+    }
 };
