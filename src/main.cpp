@@ -28,8 +28,6 @@
 
 #include "multiplatform.h"
 #include "udpTracker.hpp"
-#include "http/httpserver.hpp"
-#include "http/webapp.hpp"
 #include "tracker.hpp"
 #include "service.hpp"
 #include "logging.hpp"
@@ -103,7 +101,7 @@ int main(int argc, char *argv[])
         ;
 
 
-    const boost::program_options::options_description& configOptions = Tracker::getConfigOptions();
+    const boost::program_options::options_description& configOptions = UDPT::Tracker::getConfigOptions();
 
     boost::program_options::variables_map var_map;
     boost::program_options::store(boost::program_options::parse_command_line(argc, argv, commandLine), var_map);
@@ -218,7 +216,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        Tracker& tracker = UDPT::Tracker::getInstance();
+        UDPT::Tracker& tracker = UDPT::Tracker::getInstance();
         tracker.start(var_map);
         tracker.wait();
     }

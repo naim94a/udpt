@@ -44,10 +44,6 @@ namespace UDPT
     {
         LOG_INFO("tracker", "Requesting components to terminate...");
         m_udpTracker->stop();
-
-        // cause other components to destruct.
-        m_apiSrv = nullptr;
-        m_webApp = nullptr;
     }
 
     void Tracker::wait()
@@ -64,9 +60,7 @@ namespace UDPT
 
         if (conf["apiserver.enable"].as<bool>())
         {
-            m_apiSrv = std::shared_ptr<UDPT::Server::HTTPServer>(new UDPT::Server::HTTPServer(conf));
-            m_webApp = std::shared_ptr<UDPT::Server::WebApp>(new UDPT::Server::WebApp(m_apiSrv, m_udpTracker->m_conn.get(), conf));
-            m_webApp->deploy();
+            throw UDPTException("Web Server temporarily removed");
         }
 
         m_udpTracker->start();
@@ -140,7 +134,7 @@ namespace UDPT
         if (logFileName.length() == 0 || logFileName == "--") {
             logger.addStream(&std::cerr, real_severity);
         } else {
-            m_logStream = new ofstream(logFileName, std::ios::app | std::ios::out);
+            m_logStream = new std::ofstream(logFileName, std::ios::app | std::ios::out);
             logger.addStream(m_logStream, real_severity);
         }
 

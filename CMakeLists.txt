@@ -7,10 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 file(GLOB src_files "src/*.c"
         "src/*.cpp"
-        "src/db/*.cpp"
-        "src/http/*.cpp")
+        "src/db/*.cpp")
 
-LIST(APPEND LIBS "pthread" "sqlite3" "boost_program_options" "boost_system")
+LIST(APPEND LIBS "pthread" "sqlite3" "boost_program_options" "boost_system" "event")
 
 
 add_executable(udpt ${src_files})
