@@ -20,6 +20,8 @@
 #include <string>
 #include <ostream>
 #include <thread>
+#include <atomic>
+#include <condition_variable>
 #include "MessageQueue.hpp"
 
 #define LOG(severity, channel, message) \
@@ -61,18 +63,19 @@ namespace UDPT {
 
             void addStream(std::ostream *, Severity minSeverity=INFO);
 
-            void flush();
-
         private:
+
             Logger();
             virtual ~Logger();
-
             static void worker(Logger*);
+            void flush();
 
             std::vector<std::pair<std::ostream*, UDPT::Logging::Severity>> m_outputStreams;
             UDPT::Utils::MessageQueue<struct LogEntry> m_queue;
             std::thread m_workerThread;
-            bool m_cleaningUp;
+            std::atomic_bool m_cleaningUp;
+            std::mutex m_runningMutex;
+            std::condition_variable m_runningCondition;
             Severity m_minLogLevel;
         };
 

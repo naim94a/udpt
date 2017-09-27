@@ -30,9 +30,21 @@ namespace UDPT {
 
         Logger::~Logger() {
             try {
+                // prevent new log messages from entering queue.
                 m_cleaningUp = true;
+
+                // tell thread to exit
+                m_runningCondition.notify_one();
+
+                // wait for worker to terminate
                 m_workerThread.join();
+                // flush any remaining logs
                 flush();
+
+                // flush iostreams
+                for (std::vector<std::pair<std::ostream*, Severity>>::const_iterator it = m_outputStreams.begin(); it != m_outputStreams.end(); ++it) {
+                    it->first->flush();
+                }
             } catch (...) {
                 // can't do much here... this is a logging class...
             }
@@ -102,6 +114,8 @@ namespace UDPT {
                     }
 
                     std::ostream& current_stream = *(it->first);
+
+                    // catch an exception in case we get a broken pipe or something...
                     try {
                         current_stream << result_log << std::endl;
                     } catch (...) {
@@ -109,20 +123,17 @@ namespace UDPT {
                     }
                 }
             }
-
-            for (std::vector<std::pair<std::ostream*, Severity>>::const_iterator it = m_outputStreams.begin(); it != m_outputStreams.end(); ++it) {
-                try {
-                    it->first->flush();
-                } catch (...) {
-                    // do nothing.
-                }
-            }
         }
 
         void Logger::worker(Logger *me) {
-            while (!me->m_cleaningUp) {
+            std::unique_lock<std::mutex> lk (me->m_runningMutex);
+
+            while (true) {
                 me->flush();
-                std::this_thread::sleep_for(std::chrono::seconds(1));
+
+                if (std::cv_status::no_timeout == me->m_runningCondition.wait_for(lk, std::chrono::seconds(5))) {
+                    break;
+                }
             }
         }
     }
