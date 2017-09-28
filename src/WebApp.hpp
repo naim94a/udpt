@@ -37,6 +37,10 @@ namespace UDPT
         void stop();
 
     private:
+        static const std::string ANNOUNCE_PAGE;
+        static const std::string NOT_FOUND_PAGE;
+        static const std::string HOME_PAGE;
+
         UDPT::Data::DatabaseDriver& m_db;
 
         std::thread m_workerThread;
@@ -46,17 +50,16 @@ namespace UDPT
         // we wouldn't want to free event_base before http_server...
         std::shared_ptr<struct event_base> m_eventBase;
         std::shared_ptr<struct evhttp> m_httpServer;
-        std::shared_ptr<struct evbuffer> m_homeTemplate;
 
         static void workerThread(WebApp *);
 
-
-        static void viewHomepage(struct ::evhttp_request *, void *);
-
-        static void viewAnnounce(struct ::evhttp_request *, void *);
-
         static void viewApiTorrents(struct ::evhttp_request *, void *);
 
+        static void viewNotFound(struct ::evhttp_request *, void *);
+
         static void setCommonHeaders(struct ::evhttp_request *);
+
+        static void sendReply(struct ::evhttp_request *req, int code, const char *reason, const std::string &response);
+        static void sendReply(struct ::evhttp_request *req, int code, const char *reason, const char *response, size_t len);
     };
 }

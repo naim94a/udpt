@@ -48,21 +48,16 @@ namespace UDPT {
 
         ::evhttp_set_allowed_methods(m_httpServer.get(), EVHTTP_REQ_GET | EVHTTP_REQ_POST);
 
-        ::evhttp_set_cb(m_httpServer.get(), "/", viewHomepage, this);
-        ::evhttp_set_cb(m_httpServer.get(), "/announce", viewAnnounce, this);
+        ::evhttp_set_gencb(m_httpServer.get(), viewNotFound, this);
+        ::evhttp_set_cb(m_httpServer.get(), "/", [](struct evhttp_request *req, void *){
+            setCommonHeaders(req);
+            sendReply(req, 200, "OK", HOME_PAGE);
+        }, this);
+        ::evhttp_set_cb(m_httpServer.get(), "/announce", [](struct evhttp_request *req, void *){
+            setCommonHeaders(req);
+            sendReply(req, 200, "OK", ANNOUNCE_PAGE);
+        }, this);
         ::evhttp_set_cb(m_httpServer.get(), "/api/torrents", viewApiTorrents, this);
-
-        m_homeTemplate = std::shared_ptr<struct evbuffer>(::evbuffer_new(), ::evbuffer_free);
-
-        ::evbuffer_add_printf(m_homeTemplate.get(), "<html>"
-                "<head>"
-                "<title>UDPT</title>"
-                "</head>"
-                "<body>"
-                "<h2>UDPT Tracker</h2>"
-                "<div style=\"text-align: center; font-size: small;\"><a href=\"https://github.com/naim94a/udpt\">https://github.com/naim94a/udpt</a></div>"
-                "</body>"
-                "</html>");
     }
 
     WebApp::~WebApp() {
@@ -91,6 +86,18 @@ namespace UDPT {
         ::event_base_loopbreak(m_eventBase.get());
     }
 
+    const std::string WebApp::ANNOUNCE_PAGE = "d14:failure reason41:udpt: This is a udp tracker, not HTTP(s).e";
+    const std::string WebApp::NOT_FOUND_PAGE = "<h2>Not Found</h2>";
+    const std::string WebApp::HOME_PAGE = "<html>"
+            "<head>"
+            "<title>UDPT</title>"
+            "</head>"
+            "<body>"
+            "<h2>UDPT Tracker</h2>"
+            "<div style=\"text-align: center; font-size: small;\"><a href=\"https://github.com/naim94a/udpt\">https://github.com/naim94a/udpt</a></div>"
+            "</body>"
+            "</html>";
+
     void WebApp::workerThread(WebApp *app) {
         app->m_isRunning = true;
         ::event_base_dispatch(app->m_eventBase.get());
@@ -98,45 +105,44 @@ namespace UDPT {
         LOG_INFO("webapp", "Worker " << std::this_thread::get_id() << " exited");
     }
 
-    void WebApp::viewHomepage(struct ::evhttp_request *req, void *ctx) {
-        WebApp *app = reinterpret_cast<WebApp*>(ctx);
-        setCommonHeaders(req);
-
-        struct evbuffer *resp = evbuffer_new();
-        ::evbuffer_add_buffer_reference(resp, app->m_homeTemplate.get());
-
-        ::evhttp_send_reply(req, 200, "OK", resp);
-
-        evbuffer_free(resp);
-    }
-
-    void WebApp::viewAnnounce(struct ::evhttp_request *req, void *app) {
-        setCommonHeaders(req);
-
-        const char response_text[] = "d14:failure reason41:udpt: This is a udp tracker, not HTTP(s).e";
-        // compiler will resolve this to string length...
-        const size_t response_len = sizeof(response_text) - sizeof(response_text[0]);
-
-        struct evbuffer *response = ::evbuffer_new();
-        if (nullptr == response) {
-            LOG_ERR("webapp", "evbuffer_new() failed.");
-            return;
-        }
-
-        // avoid copying to much...
-        ::evbuffer_add_reference(response, response_text, response_len, nullptr, nullptr);
-
-        ::evhttp_send_reply(req, 200, "OK", response);
-
-        ::evbuffer_free(response);
-    }
-
     void WebApp::viewApiTorrents(struct ::evhttp_request *req, void *app) {
         setCommonHeaders(req);
+    }
+
+    void WebApp::viewNotFound(struct ::evhttp_request *req, void *app) {
+        setCommonHeaders(req);
+        sendReply(req, HTTP_NOTFOUND, "Not Found", NOT_FOUND_PAGE);
     }
 
     void WebApp::setCommonHeaders(struct ::evhttp_request *req) {
         struct evkeyvalq *resp_headers = ::evhttp_request_get_output_headers(req);
         ::evhttp_add_header(resp_headers, "Server", "udpt");
+    }
+
+    void WebApp::sendReply(struct ::evhttp_request *req, int code, const char *reason, const std::string &response) {
+        sendReply(req, code, reason, response.c_str(), response.length());
+    }
+
+    void WebApp::sendReply(struct ::evhttp_request *req, int code, const char *reason, const char *response, size_t len) {
+        std::shared_ptr<struct evbuffer> resp (::evbuffer_new(), ::evbuffer_free);
+
+        if (nullptr == resp) {
+            LOG_ERR("webapp", "evbuffer_new() failed to allocate buffer");
+            goto error;
+        }
+
+        {
+            int result = ::evbuffer_add_reference(resp.get(), response, len, nullptr, nullptr);
+            if (0 != result) {
+                LOG_ERR("webapp", "evbuffer_add_reference() returned " << result);
+                goto error;
+            }
+        }
+
+        ::evhttp_send_reply(req, code, reason, resp.get());
+
+        // This is C++, and this is the C approach, maybe fix this in the future?
+        error:
+        ::evhttp_send_error(req, HTTP_INTERNAL, "Internal Server Error");
     }
 }
