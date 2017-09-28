@@ -43,6 +43,9 @@ namespace UDPT
     void Tracker::stop()
     {
         LOG_INFO("tracker", "Requesting components to terminate...");
+        if (m_webApp != nullptr) {
+            m_webApp->stop();
+        }
         m_udpTracker->stop();
     }
 
@@ -55,15 +58,20 @@ namespace UDPT
     {
         setupLogging(conf);
         LOG_INFO("core", "Initializing...");
+        LOG_INFO("core", "compiled with boost " << BOOST_LIB_VERSION);
 
         m_udpTracker = std::shared_ptr<UDPTracker>(new UDPTracker(conf));
 
         if (conf["apiserver.enable"].as<bool>())
         {
-            throw UDPTException("Web Server temporarily removed");
+            m_webApp = std::shared_ptr<UDPT::WebApp>(new WebApp(*m_udpTracker->m_conn));
         }
 
         m_udpTracker->start();
+
+        if (m_webApp != nullptr) {
+            m_webApp->start();
+        }
     }
     
     Tracker& Tracker::getInstance()

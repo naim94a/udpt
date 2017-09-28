@@ -59,6 +59,7 @@ At the moment, you can work with the sample configuration file or the source cod
 **Donations** are the best way to contribute, we accept BitCoin:
 
 bitcoin:1KMeZvcgnmWdHitu51yEFWBNcSTXL1eBk3
+
 ![bitcoin:1KMeZvcgnmWdHitu51yEFWBNcSTXL1eBk3](.github/bitcoin-qr.png)
 
 [**Issues**](https://github.com/naim94a/udpt/issues), 

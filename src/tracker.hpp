@@ -25,6 +25,7 @@
 
 #include "multiplatform.h"
 #include "udpTracker.hpp"
+#include "WebApp.hpp"
 
 namespace UDPT
 {
@@ -46,6 +47,7 @@ namespace UDPT
 
     private:
         std::shared_ptr<UDPT::UDPTracker> m_udpTracker;
+        std::shared_ptr<UDPT::WebApp> m_webApp;
 
         Tracker();
 

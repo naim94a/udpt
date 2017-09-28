@@ -72,6 +72,8 @@ namespace UDPT
             int r;
             bool doSetup;
 
+            LOG_INFO("db-sqlite", "compiled with sqlite " << SQLITE_VERSION << ", running with " << sqlite3_libversion());
+
             fstream fCheck;
             string filename = m_conf["db.param"].as<std::string>();
 

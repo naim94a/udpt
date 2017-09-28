@@ -121,8 +121,6 @@ namespace UDPT
      * @note This method should be called only once, preferably by the main thread.
      * **/
     void UDPTracker::wait() {
-        LOG_INFO("udp-tracker", "Waiting for threads to terminate...");
-
         for (std::vector<std::thread>::iterator it = m_threads.begin(); it != m_threads.end(); ++it)
         {
             it->join();
