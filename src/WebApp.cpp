@@ -100,9 +100,7 @@ namespace UDPT {
 
     void WebApp::viewHomepage(struct ::evhttp_request *req, void *ctx) {
         WebApp *app = reinterpret_cast<WebApp*>(ctx);
-
-        struct evkeyvalq *resp_headers = ::evhttp_request_get_output_headers(req);
-        ::evhttp_add_header(resp_headers, "Server", "udpt");
+        setCommonHeaders(req);
 
         struct evbuffer *resp = evbuffer_new();
         ::evbuffer_add_buffer_reference(resp, app->m_homeTemplate.get());
@@ -113,10 +111,32 @@ namespace UDPT {
     }
 
     void WebApp::viewAnnounce(struct ::evhttp_request *req, void *app) {
+        setCommonHeaders(req);
 
+        const char response_text[] = "d14:failure reason41:udpt: This is a udp tracker, not HTTP(s).e";
+        // compiler will resolve this to string length...
+        const size_t response_len = sizeof(response_text) - sizeof(response_text[0]);
+
+        struct evbuffer *response = ::evbuffer_new();
+        if (nullptr == response) {
+            LOG_ERR("webapp", "evbuffer_new() failed.");
+            return;
+        }
+
+        // avoid copying to much...
+        ::evbuffer_add_reference(response, response_text, response_len, nullptr, nullptr);
+
+        ::evhttp_send_reply(req, 200, "OK", response);
+
+        ::evbuffer_free(response);
     }
 
     void WebApp::viewApiTorrents(struct ::evhttp_request *req, void *app) {
+        setCommonHeaders(req);
+    }
 
+    void WebApp::setCommonHeaders(struct ::evhttp_request *req) {
+        struct evkeyvalq *resp_headers = ::evhttp_request_get_output_headers(req);
+        ::evhttp_add_header(resp_headers, "Server", "udpt");
     }
 }

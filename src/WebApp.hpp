@@ -56,5 +56,7 @@ namespace UDPT
         static void viewAnnounce(struct ::evhttp_request *, void *);
 
         static void viewApiTorrents(struct ::evhttp_request *, void *);
+
+        static void setCommonHeaders(struct ::evhttp_request *);
     };
 }
