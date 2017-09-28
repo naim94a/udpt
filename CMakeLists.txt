@@ -22,3 +22,16 @@ target_compile_definitions(udpt_tests PRIVATE TEST=1)
 target_link_libraries(udpt_tests gtest ${LIBS})
 
 add_test(NAME udpt_tests COMMAND udpt_tests)
+
+# Add version to code
+execute_process(
+        COMMAND git log -1 --format="%h"
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_COMMIT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+configure_file(
+        ${CMAKE_SOURCE_DIR}/src/version.h.in
+        ${CMAKE_CURRENT_BINARY_DIR}/generated/version.h
+)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/generated)

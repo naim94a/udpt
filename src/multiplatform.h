@@ -28,8 +28,6 @@
 #define linux
 #endif
 
-#define VERSION "2.0.0"
-
 #ifdef WIN32
 #include <winsock2.h>
 #include <WS2tcpip.h>
