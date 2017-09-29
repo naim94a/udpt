@@ -18,6 +18,7 @@
 */
 #include <iostream>
 #include <fstream>
+#include <version.h>
 #include "tracker.hpp"
 #include "logging.hpp"
 
@@ -57,7 +58,7 @@ namespace UDPT
     void Tracker::start(const boost::program_options::variables_map& conf)
     {
         setupLogging(conf);
-        LOG_INFO("core", "Initializing...");
+        LOG_INFO("core", "Initializing UDPT " << VERSION << "-" << UDPT_GIT_COMMIT);
         LOG_INFO("core", "compiled with boost " << BOOST_LIB_VERSION);
 
         m_udpTracker = std::shared_ptr<UDPTracker>(new UDPTracker(conf));
