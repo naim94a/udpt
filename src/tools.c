@@ -89,7 +89,7 @@ int str_to_hash(const char *data, uint8_t *hash) {
             return -1;
         }
 
-        hash[i] = ((a && 0xff) << 8) | (b && 0xff);
+        hash[i] = ((a & 0xff) << 8) | (b & 0xff);
     }
     return 0;
 }
