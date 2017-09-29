@@ -21,6 +21,8 @@
 #include <event2/thread.h>
 #include "WebApp.hpp"
 #include "logging.hpp"
+#include "db/driver_sqlite.hpp"
+#include "tools.h"
 
 
 namespace UDPT {
@@ -46,7 +48,7 @@ namespace UDPT {
             throw std::exception();
         }
 
-        ::evhttp_set_allowed_methods(m_httpServer.get(), EVHTTP_REQ_GET | EVHTTP_REQ_POST);
+        ::evhttp_set_allowed_methods(m_httpServer.get(), EVHTTP_REQ_GET | EVHTTP_REQ_POST | EVHTTP_REQ_DELETE);
 
         ::evhttp_set_gencb(m_httpServer.get(), viewNotFound, this);
         ::evhttp_set_cb(m_httpServer.get(), "/", [](struct evhttp_request *req, void *){
@@ -105,8 +107,77 @@ namespace UDPT {
         LOG_INFO("webapp", "Worker " << std::this_thread::get_id() << " exited");
     }
 
-    void WebApp::viewApiTorrents(struct ::evhttp_request *req, void *app) {
+    void WebApp::viewApiTorrents(struct ::evhttp_request *req, void *app_) {
+        WebApp *app = reinterpret_cast<WebApp*>(app_);
+
         setCommonHeaders(req);
+        addHeaders(req, std::multimap<std::string, std::string>( { {"Content-Type", "text/json"} } ));
+
+        enum evhttp_cmd_type requestMethod = ::evhttp_request_get_command(req);
+        if (requestMethod != EVHTTP_REQ_POST && requestMethod != EVHTTP_REQ_DELETE) {
+            sendReply(req, HTTP_BADMETHOD, "Bad Method", "{\"error\": \"Invalid method\"}");
+            return;
+        }
+
+        const struct evhttp_uri *requestUri = ::evhttp_request_get_evhttp_uri(req);
+        if (nullptr == requestUri) {
+            LOG_ERR("webapp", "evhttp_request_get_evhttp_uri() returned NULL.");
+            sendReply(req, HTTP_INTERNAL, "Internal Server Error", "{\"error\": \"Internal Server Error\"}");
+            return;
+        }
+
+        const char *query = ::evhttp_uri_get_query(requestUri);
+        if (nullptr == query) {
+            sendReply(req, HTTP_BADREQUEST, "Bad Request", "{\"error\": \"This method requires parameters.\"}");
+            return;
+        }
+
+        const std::multimap<std::string, std::string> &params = parseQueryParameters(query);
+        std::vector<std::string> hashes;
+
+        for (std::multimap<std::string, std::string>::const_iterator it = params.find("info_hash"); it != params.end(); it++) {
+            hashes.push_back(it->second);
+        }
+
+        if (hashes.size() != 1) {
+            sendReply(req, HTTP_BADREQUEST, "Bad Request", "{\"error\": \"exactly one info_hash argument is required.\"}");
+            return;
+        }
+
+        const std::string &info_hash = hashes.front();
+
+        if (info_hash.length() != 40) {
+            sendReply(req, HTTP_BADREQUEST, "Bad Request", "{\"error\": \"info_hash length is incorrect.\"}");
+            return;
+        }
+
+        uint8_t hash [20] = {0};
+        if (0 != ::str_to_hash(info_hash.c_str(), hash)) {
+            sendReply(req, HTTP_BADREQUEST, "Bad Request", "{\"error\": \"info_hash is invalid.\"}");
+            return;
+        }
+
+        if (requestMethod == EVHTTP_REQ_POST) {
+            // add torrent
+            if (!app->m_db.addTorrent(hash)) {
+                sendReply(req, HTTP_INTERNAL, "Internal Server Error", "{\"error\": \"Failed to add torrent.\"}");
+                return;
+            }
+        }
+        else if (requestMethod == EVHTTP_REQ_DELETE) {
+            // remove torrent
+            if (!app->m_db.removeTorrent(hash)) {
+                sendReply(req, HTTP_INTERNAL, "Internal Server Error", "{\"error\": \"Failed to remove torrent.\"}");
+                return;
+            }
+        }
+
+        if (app->m_db.isDynamic()) {
+            sendReply(req, HTTP_OK, "OK", "{\"result\": \"Okay\", \"note\": \"tracker is in dynamic mode.\"}");
+        } else {
+            sendReply(req, HTTP_OK, "OK", "{\"result\": \"Okay\"}");
+        }
+        return;
     }
 
     void WebApp::viewNotFound(struct ::evhttp_request *req, void *app) {
@@ -114,10 +185,52 @@ namespace UDPT {
         sendReply(req, HTTP_NOTFOUND, "Not Found", NOT_FOUND_PAGE);
     }
 
-    void WebApp::setCommonHeaders(struct ::evhttp_request *req) {
+    void WebApp::addHeaders(struct ::evhttp_request *req, const std::multimap<std::string, std::string>& headers) {
         struct evkeyvalq *resp_headers = ::evhttp_request_get_output_headers(req);
-        ::evhttp_add_header(resp_headers, "Server", "udpt");
+
+        for(std::multimap<std::string, std::string>::const_iterator it = headers.begin(); it != headers.end(); it++) {
+            ::evhttp_add_header(resp_headers, it->first.c_str(), it->second.c_str());
+        }
     }
+
+    void WebApp::setCommonHeaders(struct ::evhttp_request *req) {
+        std::multimap<std::string, std::string> headers;
+        headers.insert(std::pair<std::string, std::string>("Server", "udpt"));
+
+        addHeaders(req, headers);
+    }
+
+    std::multimap<std::string, std::string> WebApp::parseQueryParameters(const std::string& query) {
+        std::string::size_type key_begin = 0, key_end = 0, value_begin = 0, value_end = 0;
+        std::multimap<std::string, std::string> result;
+
+        while (key_begin <= query.length()) {
+            key_end = query.find('=', key_begin);
+            if (key_end == std::string::npos) {
+                // a key by itself is unacceptable...
+                break;
+            }
+
+            value_begin = key_end + 1;
+            value_end = query.find('&', value_begin);
+
+            if (value_end == std::string::npos) {
+                // this is the last value...
+                value_end = query.length();
+            }
+
+            // insert parsed param into map:
+            const std::string &key = query.substr(key_begin, key_end - key_begin);
+            const std::string &value = query.substr(value_begin, value_end - value_begin);
+
+            result.insert(std::pair<std::string, std::string>(key, value));
+
+            // get ready for next iteration...
+            key_begin = value_end + 1;
+
+        }
+        return result;
+    };
 
     void WebApp::sendReply(struct ::evhttp_request *req, int code, const char *reason, const std::string &response) {
         sendReply(req, code, reason, response.c_str(), response.length());

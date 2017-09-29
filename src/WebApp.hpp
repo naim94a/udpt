@@ -57,8 +57,13 @@ namespace UDPT
 
         static void viewNotFound(struct ::evhttp_request *, void *);
 
+        static void addHeaders(struct ::evhttp_request *, const std::multimap<std::string, std::string>& headers);
+
         static void setCommonHeaders(struct ::evhttp_request *);
 
+        static std::multimap<std::string, std::string> parseQueryParameters(const std::string& query);
+
+        // these methods are currently only safe for static strings...
         static void sendReply(struct ::evhttp_request *req, int code, const char *reason, const std::string &response);
         static void sendReply(struct ::evhttp_request *req, int code, const char *reason, const char *response, size_t len);
     };
