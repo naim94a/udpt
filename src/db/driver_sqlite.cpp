@@ -153,7 +153,7 @@ namespace UDPT
             sqlite3_stmt *stmt;
             int r, i;
 
-            to_hex_str(info_hash, hash);
+            hash_to_str(info_hash, hash);
 
             sql = "SELECT ip,port FROM 't";
             sql += hash;
@@ -197,7 +197,7 @@ namespace UDPT
             int r;
 
             char *hash = xHash;
-            to_hex_str(info_hash, hash);
+            hash_to_str(info_hash, hash);
 
             addTorrent (info_hash);
 
