@@ -443,6 +443,6 @@ namespace UDPT
         }
 
         lk.unlock();
-        LOG_INFO("udp-tracker", "Maintenance thread " << std::this_thread::get_id() << " existed.");
+        LOG_INFO("udp-tracker", "Maintenance thread " << std::this_thread::get_id() << " exited.");
     }
 };
