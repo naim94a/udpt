@@ -19,6 +19,7 @@
 #include <event2/buffer.h>
 #include <event2/event.h>
 #include <event2/thread.h>
+#include <cstdint>
 #include "WebApp.hpp"
 #include "logging.hpp"
 #include "db/driver_sqlite.hpp"
@@ -99,6 +100,16 @@ namespace UDPT {
             "<div style=\"text-align: center; font-size: small;\"><a href=\"https://github.com/naim94a/udpt\">https://github.com/naim94a/udpt</a></div>"
             "</body>"
             "</html>";
+    const std::string WebApp::JSON_INVALID_METHOD = "{\"error\": \"Invalid method\"}";
+    const std::string WebApp::JSON_INTERNAL_ERROR = "{\"error\": \"Internal Server Error\"}";
+    const std::string WebApp::JSON_PARAMS_REQUIRED = "{\"error\": \"This method requires parameters.\"}";
+    const std::string WebApp::JSON_INFOHASH_REQUIRED = "{\"error\": \"exactly one info_hash argument is required.\"}";
+    const std::string WebApp::JSON_INFOHASH_INVALID = "{\"error\": \"info_hash length is incorrect.\"}";
+    const std::string WebApp::JSON_TORRENT_ADD_FAIL = "{\"error\": \"Failed to add torrent.\"}";
+    const std::string WebApp::JSON_TORRENT_REMOVE_FAIL = "{\"error\": \"Failed to remove torrent.\"}";
+    const std::string WebApp::JSON_OKAY = "{\"result\": \"Okay\"}";
+    const std::string WebApp::JSON_OKAY_DYNAMIC = "{\"result\": \"Okay\", \"note\": \"tracker is in dynamic mode.\"}";
+
 
     void WebApp::workerThread(WebApp *app) {
         app->m_isRunning = true;
@@ -115,20 +126,20 @@ namespace UDPT {
 
         enum evhttp_cmd_type requestMethod = ::evhttp_request_get_command(req);
         if (requestMethod != EVHTTP_REQ_POST && requestMethod != EVHTTP_REQ_DELETE) {
-            sendReply(req, HTTP_BADMETHOD, "Bad Method", "{\"error\": \"Invalid method\"}");
+            sendReply(req, HTTP_BADMETHOD, "Bad Method", JSON_INVALID_METHOD);
             return;
         }
 
         const struct evhttp_uri *requestUri = ::evhttp_request_get_evhttp_uri(req);
         if (nullptr == requestUri) {
             LOG_ERR("webapp", "evhttp_request_get_evhttp_uri() returned NULL.");
-            sendReply(req, HTTP_INTERNAL, "Internal Server Error", "{\"error\": \"Internal Server Error\"}");
+            sendReply(req, HTTP_INTERNAL, "Internal Server Error", JSON_INTERNAL_ERROR);
             return;
         }
 
         const char *query = ::evhttp_uri_get_query(requestUri);
         if (nullptr == query) {
-            sendReply(req, HTTP_BADREQUEST, "Bad Request", "{\"error\": \"This method requires parameters.\"}");
+            sendReply(req, HTTP_BADREQUEST, "Bad Request", JSON_PARAMS_REQUIRED);
             return;
         }
 
@@ -140,42 +151,42 @@ namespace UDPT {
         }
 
         if (hashes.size() != 1) {
-            sendReply(req, HTTP_BADREQUEST, "Bad Request", "{\"error\": \"exactly one info_hash argument is required.\"}");
+            sendReply(req, HTTP_BADREQUEST, "Bad Request", JSON_INFOHASH_REQUIRED);
             return;
         }
 
         const std::string &info_hash = hashes.front();
 
         if (info_hash.length() != 40) {
-            sendReply(req, HTTP_BADREQUEST, "Bad Request", "{\"error\": \"info_hash length is incorrect.\"}");
+            sendReply(req, HTTP_BADREQUEST, "Bad Request", JSON_INFOHASH_INVALID);
             return;
         }
 
         uint8_t hash [20] = {0};
         if (0 != ::str_to_hash(info_hash.c_str(), hash)) {
-            sendReply(req, HTTP_BADREQUEST, "Bad Request", "{\"error\": \"info_hash is invalid.\"}");
+            sendReply(req, HTTP_BADREQUEST, "Bad Request", JSON_INFOHASH_INVALID);
             return;
         }
 
         if (requestMethod == EVHTTP_REQ_POST) {
             // add torrent
             if (!app->m_db.addTorrent(hash)) {
-                sendReply(req, HTTP_INTERNAL, "Internal Server Error", "{\"error\": \"Failed to add torrent.\"}");
+                sendReply(req, HTTP_INTERNAL, "Internal Server Error", JSON_TORRENT_ADD_FAIL);
                 return;
             }
         }
         else if (requestMethod == EVHTTP_REQ_DELETE) {
             // remove torrent
             if (!app->m_db.removeTorrent(hash)) {
-                sendReply(req, HTTP_INTERNAL, "Internal Server Error", "{\"error\": \"Failed to remove torrent.\"}");
+                sendReply(req, HTTP_INTERNAL, "Internal Server Error", JSON_TORRENT_REMOVE_FAIL);
                 return;
             }
         }
 
         if (app->m_db.isDynamic()) {
-            sendReply(req, HTTP_OK, "OK", "{\"result\": \"Okay\", \"note\": \"tracker is in dynamic mode.\"}");
+            sendReply(req, HTTP_OK, "OK", JSON_OKAY_DYNAMIC);
         } else {
-            sendReply(req, HTTP_OK, "OK", "{\"result\": \"Okay\"}");
+            sendReply(req, HTTP_OK, "OK", JSON_OKAY);
         }
         return;
     }

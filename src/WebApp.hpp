@@ -40,6 +40,15 @@ namespace UDPT
         static const std::string ANNOUNCE_PAGE;
         static const std::string NOT_FOUND_PAGE;
         static const std::string HOME_PAGE;
+        static const std::string JSON_INVALID_METHOD;
+        static const std::string JSON_INTERNAL_ERROR;
+        static const std::string JSON_PARAMS_REQUIRED;
+        static const std::string JSON_INFOHASH_REQUIRED;
+        static const std::string JSON_INFOHASH_INVALID;
+        static const std::string JSON_TORRENT_ADD_FAIL;
+        static const std::string JSON_TORRENT_REMOVE_FAIL;
+        static const std::string JSON_OKAY;
+        static const std::string JSON_OKAY_DYNAMIC;
 
         UDPT::Data::DatabaseDriver& m_db;
 
