@@ -24,7 +24,7 @@
 
 #ifdef WIN32
 
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__FreeBSD__)
 #include <arpa/inet.h>
 #endif
 
@@ -73,13 +73,11 @@ namespace UDPT
 
         {
             // don't block recvfrom for too long.
-#if defined(linux)
+#if defined(__linux__) || defined(__FreeBSD__)
             timeval timeout = { 0 };
             timeout.tv_sec = 5;
 #elif defined(WIN32)
             DWORD timeout = 5000;
-#else
-#error Unsupported OS.
 #endif
             ::setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<const char*>(&timeout), sizeof(timeout));
         }
@@ -91,11 +89,11 @@ namespace UDPT
         {
             LOG_FATAL("udp-tracker", "Failed to bind socket. error=" << errno);
 
-    #ifdef WIN32
+#ifdef WIN32
             ::closesocket(sock);
-    #elif defined (linux)
+#elif defined(__linux__) || defined(__FreeBSD__)
             ::close(sock);
-    #endif
+#endif
             throw UDPT::UDPTException("Failed to bind socket.");
         }
 
@@ -135,9 +133,9 @@ namespace UDPT
 
         LOG_INFO("udp-tracker", "UDP Tracker terminated");
 
-#ifdef linux
+#if defined(__linux__) || defined(__FreeBSD__)
         ::close(m_sock);
-#elif defined (WIN32)
+#elif defined(WIN32)
         ::closesocket(m_sock);
 #endif
     }
@@ -412,11 +410,7 @@ namespace UDPT
         struct sockaddr_in remoteAddr;
         char tmpBuff[UDP_BUFFER_SIZE];
 
-#ifdef linux
-        socklen_t addrSz;
-#else
-        int addrSz;
-#endif
+        unsigned int addrSz;
 
         addrSz = sizeof(struct sockaddr_in);
 

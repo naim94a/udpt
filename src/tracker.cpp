@@ -104,7 +104,7 @@ namespace UDPT
             ("logging.filename", boost::program_options::value<std::string>()->default_value("/var/log/udpt.log"), "file to write logs to")
             ("logging.level", boost::program_options::value<std::string>()->default_value("warning"), "log level (fatal/error/warning/info/debug)")
 
-#ifdef linux
+#if defined(__linux__) || defined(__FreeBSD__)
             ("daemon.chdir", boost::program_options::value<std::string>()->default_value("/"), "home directory for daemon")
 #endif
 #ifdef WIN32 

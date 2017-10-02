@@ -24,7 +24,7 @@
 #include <algorithm>
 #include <boost/program_options.hpp>
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
 #include <unistd.h>
 #include <sys/stat.h>
 #elif defined(WIN32)
@@ -53,7 +53,7 @@ extern "C" void _signal_handler(int sig) {
     }
 }
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
 static void daemonize(const boost::program_options::variables_map& conf) {
     if (1 == ::getppid()) {
         // already a daemon
@@ -88,6 +88,8 @@ static std::string getPlatformName() {
     return "Windows";
 #elif __linux__
     return "Linux";
+#elif __FreeBSD__
+    return "FreeBSD";
 #elif __APPLE__
     return "Apple";
 #else
@@ -119,8 +121,8 @@ int main(int argc, const char *argv[])
         ("all-help", "displays all help")
         ("test,t", "test configuration file")
         ("config,c", boost::program_options::value<std::string>()->default_value("/etc/udpt.conf"), "configuration file to use")
-#ifdef __linux__
-        ("interactive,i", "doesn't start as daemon")
+#if defined(__linux__) || defined(__FreeBSD__)
+        ("interactive,i", "don't start as daemon")
 #endif
 #ifdef WIN32
         ("service,s", boost::program_options::value<std::string>(), "start/stop/install/uninstall service")
@@ -176,7 +178,7 @@ int main(int argc, const char *argv[])
         }
     }
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
     if (!var_map.count("interactive"))
     {
         daemonize(var_map);

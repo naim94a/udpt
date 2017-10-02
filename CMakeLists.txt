@@ -10,6 +10,10 @@ file(GLOB src_files "src/*.c"
         "src/*.cpp"
         "src/db/*.cpp")
 
+if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
+    include_directories("/usr/include" "/usr/local/include")
+endif()
+
 find_library(PTHREADS NAMES "pthread")
 find_library(SQLITE NAMES "sqlite3" "libsqlite" "libsqlite3")
 find_library(BOOST_PROG_OPTS NAMES "boost_program_options")
