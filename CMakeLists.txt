@@ -10,7 +10,15 @@ file(GLOB src_files "src/*.c"
         "src/*.cpp"
         "src/db/*.cpp")
 
-LIST(APPEND LIBS "pthread" "sqlite3" "boost_program_options" "boost_system" "event" "event_pthreads")
+find_library(PTHREADS NAMES "pthread")
+find_library(SQLITE NAMES "sqlite3" "libsqlite" "libsqlite3")
+find_library(BOOST_PROG_OPTS NAMES "boost_program_options")
+find_library(BOOST_SYSTEM NAMES "boost_system")
+find_library(LIBEVENT NAMES "event")
+find_library(LIBEVENTP NAMES "event_pthreads")
+find_library(GTEST NAMES "gtest")
+
+LIST(APPEND LIBS ${PTHREADS} ${SQLITE} ${BOOST_PROG_OPTS} ${BOOST_SYSTEM} ${LIBEVENT} ${LIBEVENTP})
 add_definitions(-Wall)
 
 add_executable(udpt ${src_files})
@@ -19,7 +27,7 @@ target_link_libraries(udpt ${LIBS})
 add_executable(udpt_tests EXCLUDE_FROM_ALL tests/main.cpp ${src_files})
 target_compile_definitions(udpt_tests PRIVATE TEST=1)
 
-target_link_libraries(udpt_tests gtest ${LIBS})
+target_link_libraries(udpt_tests ${GTEST} ${LIBS})
 
 add_test(NAME udpt_tests COMMAND udpt_tests)
 
