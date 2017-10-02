@@ -49,12 +49,6 @@ but releases don't get updated as often as the master branch...
 
 You should note that the default configuration does not use a persistent database.
 
-## Documentation
-UDPT doesnt have a formal documentation at the moment. 
-People are welcome to view and modify our [Wiki at GitHub](https://github.com/naim94a/udpt/wiki) or UDPT's website.
-
-At the moment, you can work with the sample configuration file or the source code.
-
 ### Links
 * UDPT's documentation can be found in the docs directory, or the rendered version at [naim94a.github.io/udpt](https://naim94a.github.io/udpt). 
 * If you have any suggestions or find any bugs, please report them here: https://github.com/naim94a/udpt/issues
