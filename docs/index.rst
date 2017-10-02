@@ -14,22 +14,45 @@ UDPT
     udpt.conf
     restapi.rst
 
-UDPT is a lightweight UDP torrent tracker, it implements BEP15_ of the BitTorrent protocol.
+UDPT is a lightweight UDP torrent tracker written in C++, it implements BEP15_ of the BitTorrent protocol.
 This project was developed with simplicity and security in mind.
-
-This project is being developed by `@naim94a`_. UDPT's development started November 20th, 2012.
-
-Source code can be found here: https://github.com/naim94a/udpt
+Unlike most tracker, UDPT will save you bandwidth from all that TCP overhead.
 
 Features
 --------
 * UDP protocol based tracker
 * :doc:`Simple INI configuration file <udpt.conf>`
 * :doc:`HTTP REST API <restapi>`
-* In Memory volatile database
+* SQLite3 database, support for in-*:memory:*.
 * Logging
 * Linux daemon / Windows Service
 * Choice of *static* or *dynamic* tracker modes
 
+Licenses & 3rd party libraries
+------------------------------
+UDPT is released under GPLv3_, and uses GPLv3 compatible libraries:
+
+* SQLite3, released under the public domain.
+* Boost, released under the `BOOST LICENSE`_.
+* libevent, released under the `3-clause BSD license`_.
+
+Contributing
+------------
+Feel free to submit `issues <https://github.com/naim94a/udpt/issues>`_, `PRs <https://github.com/naim94a/udpt/pulls>`_ or donations!
+
+.. see:: `CONTRIBUTING <https://github.com/naim94a/udpt/blob/master/.github/CONTRIBUTING.md>`
+
+.. image:: _static/bitcoin-qr.png
+    :alt: bitcoin:1KMeZvcgnmWdHitu51yEFWBNcSTXL1eBk3
+
+`bitcoin:1KMeZvcgnmWdHitu51yEFWBNcSTXL1eBk3 <bitcoin:1KMeZvcgnmWdHitu51yEFWBNcSTXL1eBk3>`_
+
+Author
+------
+UDPT's development started November 20th, 2012 by Naim A. (`@naim94a`_).
+
 .. _BEP15: http://www.bittorrent.org/beps/bep_0015.html
+.. _GPLv3: https://www.gnu.org/licenses/gpl-3.0.en.html
+.. _BOOST LICENSE: http://www.boost.org/LICENSE_1_0.txt
+.. _3-clause BSD license: http://libevent.org/LICENSE.txt
 .. _@naim94a: https://github.com/naim94a/
