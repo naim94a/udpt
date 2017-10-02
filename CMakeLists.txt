@@ -25,5 +25,6 @@ add_test(NAME udpt_tests COMMAND udpt_tests)
 
 add_custom_target(docs
         COMMAND python -msphinx -M html . _build
+        COMMAND python -msphinx -M man . _build
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs
-        COMMENT Building HTML docs)
+        COMMENT Building docs)

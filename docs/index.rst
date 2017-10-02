@@ -13,6 +13,7 @@ UDPT Documentation
     :hidden:
 
     building
+    udpt
     udpt.conf
     restapi.rst
 

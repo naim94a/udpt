@@ -144,8 +144,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'udpt', 'UDPT Documentation',
-     [author], 1)
+    ('udpt.conf', 'udpt.conf', 'UDPT Configuration', [author], 5),
+    ('udpt', 'udpt', 'UDP Torrent Tracker', [author], 8),
 ]
 
 

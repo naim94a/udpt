@@ -96,3 +96,5 @@ Example
     [logging]
     filename = /var/log/udpt.log
     level = warning
+
+.. seealso:: :doc:`udpt(8) <udpt>`
