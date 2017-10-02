@@ -25,10 +25,12 @@
 #include <sstream>
 #include <list>
 #include <ctime>
+#include <atomic>
 #include <thread>
-#include <boost/program_options.hpp>
 #include <mutex>
 #include <condition_variable>
+
+#include <boost/program_options.hpp>
 
 #ifdef WIN32
 #else

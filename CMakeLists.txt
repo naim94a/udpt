@@ -47,3 +47,9 @@ configure_file(
         ${CMAKE_CURRENT_BINARY_DIR}/generated/version.h
 )
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/generated)
+
+add_custom_target(docs
+        COMMAND python -msphinx -M html . _build
+        COMMAND python -msphinx -M man . _build
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs
+        COMMENT Building docs)

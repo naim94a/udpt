@@ -55,10 +55,15 @@ People are welcome to view and modify our [Wiki at GitHub](https://github.com/na
 
 At the moment, you can work with the sample configuration file or the source code.
 
+### Links
+* UDPT's documentation can be found in the docs directory, or the rendered version at [naim94a.github.io/udpt](https://naim94a.github.io/udpt). 
+* If you have any suggestions or find any bugs, please report them here: https://github.com/naim94a/udpt/issues
+* Project Page: http://www.github.com/naim94a/udpt
+
 ## How to Contribute
 **Donations** are the best way to contribute, we accept BitCoin:
 
-bitcoin:1KMeZvcgnmWdHitu51yEFWBNcSTXL1eBk3
+<a href="bitcoin://1KMeZvcgnmWdHitu51yEFWBNcSTXL1eBk3">bitcoin:1KMeZvcgnmWdHitu51yEFWBNcSTXL1eBk3</a>
 
 ![bitcoin:1KMeZvcgnmWdHitu51yEFWBNcSTXL1eBk3](.github/bitcoin-qr.png)
 
