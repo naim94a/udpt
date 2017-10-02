@@ -16,9 +16,7 @@
  *		You should have received a copy of the GNU General Public License
  *		along with UDPT.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef TOOLS_H_
-#define TOOLS_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -48,5 +46,3 @@ int str_to_hash(const char *data, uint8_t *hash);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* TOOLS_H_ */

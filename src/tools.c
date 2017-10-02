@@ -16,9 +16,7 @@
  *		You should have received a copy of the GNU General Public License
  *		along with UDPT.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include "tools.h"
-#include "multiplatform.h"
 
 void m_byteswap (void *dest, void *src, int sz)
 {

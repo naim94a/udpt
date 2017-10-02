@@ -1,6 +1,8 @@
 #pragma once
 
-#include "multiplatform.h"
+#ifdef WIN32
+#include <Windows.h>
+#endif
 
 namespace UDPT
 {

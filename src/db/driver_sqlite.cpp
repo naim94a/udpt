@@ -17,15 +17,15 @@
  *		along with UDPT.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "driver_sqlite.hpp"
-#include "../tools.h"
 #include <ctime>
 #include <sstream>
 #include <fstream>
 #include <iostream>
 #include <cassert>
-#include <cstring> // memcpy
-#include "../multiplatform.h"
+#include <cstring>
+
+#include "driver_sqlite.hpp"
+#include "../tools.h"
 #include "../logging.hpp"
 
 using namespace std;
