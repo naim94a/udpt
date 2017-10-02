@@ -39,7 +39,7 @@
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="UDPT 2.1.0 documentation" href="index.html"/>
         <link rel="next" title="2. UDPT Usage" href="udpt.html"/>
-        <link rel="prev" title="UDPT Documentation" href="index.html"/> 
+        <link rel="prev" title="UDPT" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -96,13 +96,12 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">1. Building UDPT</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#obtaining-source-code">1.1. Obtaining source code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#building-for-linux">1.2. Building for Linux</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#building-for-linux-freebsd">1.2. Building for Linux &amp; FreeBSD</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#installing-dependencies">1.2.1. Installing dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#compiling">1.2.2. Compiling</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#building-for-freebsd">1.3. Building for FreeBSD</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#building-for-windows">1.4. Building for Windows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-for-windows">1.3. Building for Windows</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="udpt.html">2. UDPT Usage</a></li>
@@ -185,8 +184,8 @@
 </pre></div>
 </div>
 </div>
-<div class="section" id="building-for-linux">
-<h2>1.2. Building for Linux<a class="headerlink" href="#building-for-linux" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="building-for-linux-freebsd">
+<h2>1.2. Building for Linux &amp; FreeBSD<a class="headerlink" href="#building-for-linux-freebsd" title="Permalink to this headline">¶</a></h2>
 <p>The author of UDPT used ArchLinux for development, so the documentation assumes you are using ArchLinux. You should be able to get the following instructions to work on most Linux distributions.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -217,6 +216,10 @@
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">libsqlite3</span><span class="o">-</span><span class="n">dev</span> <span class="n">libevent</span><span class="o">-</span><span class="n">dev</span> <span class="n">libboost</span><span class="o">-</span><span class="n">dev</span> <span class="n">cmake</span> <span class="n">git</span> <span class="n">gcc</span> <span class="n">binutils</span> <span class="n">libgtest</span><span class="o">-</span><span class="n">dev</span>
 </pre></div>
 </div>
+<p>On FreeBSD (11.1R):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pkg</span> <span class="n">install</span> <span class="n">sqlite3</span> <span class="n">boost</span><span class="o">-</span><span class="nb">all</span> <span class="n">libevent</span> <span class="n">cmake</span> <span class="n">git</span> <span class="n">binutils</span> <span class="n">llvm40</span> <span class="n">googletest</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="compiling">
 <h3>1.2.2. Compiling<a class="headerlink" href="#compiling" title="Permalink to this headline">¶</a></h3>
@@ -231,18 +234,11 @@
 <p>If everything succeeded, head over to <a class="reference internal" href="udpt.conf.html"><span class="doc">UDPT Configuration File</span></a> and get your tracker running!</p>
 </div>
 </div>
-<div class="section" id="building-for-freebsd">
-<h2>1.3. Building for FreeBSD<a class="headerlink" href="#building-for-freebsd" title="Permalink to this headline">¶</a></h2>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">This section is under construction.</p>
-</div>
-</div>
 <div class="section" id="building-for-windows">
-<h2>1.4. Building for Windows<a class="headerlink" href="#building-for-windows" title="Permalink to this headline">¶</a></h2>
-<div class="admonition error">
-<p class="first admonition-title">Error</p>
-<p class="last">Building on Windows is currently not supported :(</p>
+<h2>1.3. Building for Windows<a class="headerlink" href="#building-for-windows" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This documentation is a work-in-progress. Stay tuned!</p>
 </div>
 </div>
 </div>
@@ -260,7 +256,7 @@
         <a href="udpt.html" class="btn btn-neutral float-right" title="2. UDPT Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="UDPT Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral" title="UDPT" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

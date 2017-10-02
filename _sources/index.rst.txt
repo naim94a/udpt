@@ -27,6 +27,7 @@ Features
 * Logging
 * Linux daemon / Windows Service
 * Choice of *static* or *dynamic* tracker modes
+* Works with Windows, Linux and FreeBSD
 
 Licenses & 3rd party libraries
 ------------------------------
@@ -40,7 +41,7 @@ Contributing
 ------------
 Feel free to submit `issues <https://github.com/naim94a/udpt/issues>`_, `PRs <https://github.com/naim94a/udpt/pulls>`_ or donations!
 
-.. see:: `CONTRIBUTING <https://github.com/naim94a/udpt/blob/master/.github/CONTRIBUTING.md>`
+.. seealso:: `CONTRIBUTING <https://github.com/naim94a/udpt/blob/master/.github/CONTRIBUTING.md>`_
 
 .. image:: _static/bitcoin-qr.png
     :alt: bitcoin:1KMeZvcgnmWdHitu51yEFWBNcSTXL1eBk3

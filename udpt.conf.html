@@ -319,6 +319,30 @@ a filename. <em>:memory:</em> can be used for in-memory DB.</td>
 </table>
 </div></blockquote>
 </li>
+<li><p class="first"><strong>Section [daemon]</strong> - Daemon settings.</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="14%" />
+<col width="18%" />
+<col width="53%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Key</strong></td>
+<td><strong>Type</strong></td>
+<td><strong>Example</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td>chdir</td>
+<td>string</td>
+<td>/opt/udpt</td>
+<td>The directory to chroot to when running as a daemon.</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</li>
 </ul>
 </div>
 <div class="section" id="example">
@@ -343,6 +367,10 @@ a filename. <em>:memory:</em> can be used for in-memory DB.</td>
 <span class="na">enable</span> <span class="o">=</span> <span class="s">yes</span>
 <span class="na">port</span> <span class="o">=</span> <span class="s">8081</span>
 <span class="na">threads</span> <span class="o">=</span> <span class="s">2</span>
+
+<span class="c1"># Daemon chroot settings</span>
+<span class="k">[daemon]</span>
+<span class="na">chdir</span> <span class="o">=</span> <span class="s">/home/udpt/</span>
 
 <span class="c1"># Logging</span>
 <span class="k">[logging]</span>

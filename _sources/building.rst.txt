@@ -19,8 +19,8 @@ If you prefer, you can head over to the project on GitHub and download a tarball
     curl -Lo udpt-master.tgz https://github.com/naim94a/udpt/archive/master.tar.gz
     tar -xvf udpt
 
-Building for Linux
-==================
+Building for Linux & FreeBSD
+============================
 The author of UDPT used ArchLinux for development, so the documentation assumes you are using ArchLinux. You should be able to get the following instructions to work on most Linux distributions.
 
 .. note:: Package names vary between distributions, for example: The SQLite package (with development headers/libs) on ArchLinux is *sqlite*, where on Debian you’ll need *libsqlite3-dev*.
@@ -51,6 +51,10 @@ On Debian::
 
     sudo apt-get install libsqlite3-dev libevent-dev libboost-dev cmake git gcc binutils libgtest-dev
 
+On FreeBSD (11.1R)::
+
+    pkg install sqlite3 boost-all libevent cmake git binutils llvm40 googletest
+
 Compiling
 ---------
 Okay, now that you have the source code and all the dependencies, you may execute the following::
@@ -64,13 +68,9 @@ This should leave you with a udpt executable file, and optionally a udpt_tests e
 
 If everything succeeded, head over to :doc:`udpt.conf` and get your tracker running!
 
-Building for FreeBSD
-====================
-.. warning:: This section is under construction.
-
 Building for Windows
 ====================
-.. error:: Building on Windows is currently not supported :(
+.. note:: This documentation is a work-in-progress. Stay tuned!
 
 .. _UDPT: https://github.com/naim94a/udpt
 .. _sqlite: https://www.sqlite.org/
