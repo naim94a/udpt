@@ -1,0 +1,286 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>4. HTTP Rest API &mdash; UDPT 2.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+    <link rel="canonical" href="https://naim94a.github.io/udptrestapi.html"/>
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="UDPT 2.1.0 documentation" href="index.html"/>
+        <link rel="prev" title="3. UDPT Configuration File" href="udpt.conf.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> UDPT
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="building.html">1. Building UDPT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udpt.html">2. UDPT Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udpt.conf.html">3. UDPT Configuration File</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">4. HTTP Rest API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#security-considerations">4.1. Security Considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api-methods">4.2. API Methods</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">UDPT</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>4. HTTP Rest API</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="http-rest-api">
+<h1>4. HTTP Rest API<a class="headerlink" href="#http-rest-api" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The REST API is only useful in <em>non-dynamic mode</em>.</p>
+</div>
+<div class="section" id="security-considerations">
+<h2>4.1. Security Considerations<a class="headerlink" href="#security-considerations" title="Permalink to this headline">¶</a></h2>
+<p>The REST API of UDPT was meant for use of the tracker’s owner.
+It will reject any connecting with a source address other than <em>127.0.0.1</em>.</p>
+<p>User’s of the REST API should make sure that unauthorized people won’t gain access.</p>
+<p>Attempting to access the api server with a BitTorrent client will result in the following message:
+“this is a UDP tracker, not a HTTP tracker.”</p>
+</div>
+<div class="section" id="api-methods">
+<h2>4.2. API Methods<a class="headerlink" href="#api-methods" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">Adding torrents</p>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>curl <span class="s2">&quot;http://127.0.0.1:8081/api?action=add&amp;hash=9228628504cc40efa57bf38e85c9e3bd2c572b5b&quot;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">Removing torrents</p>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>curl <span class="s2">&quot;http://127.0.0.1:8081/api?action=remove&amp;hash=9228628504cc40efa57bf38e85c9e3bd2c572b5b&quot;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+<p>With both methods, the response should be:</p>
+<div class="highlight-json"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="kc">true</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>In case of error, you will receive:</p>
+<div class="highlight-json"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="s2">&quot;failure reason&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>With one of the following reasons:</p>
+<ul class="simple">
+<li>failed to add torrent to DB</li>
+<li>invalid info_hash.</li>
+<li>Hash length must be 40 characters.</li>
+<li>failed to remove torrent from DB</li>
+<li>unknown action</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="udpt.conf.html" class="btn btn-neutral" title="3. UDPT Configuration File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Naim A..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'2.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
