@@ -65,7 +65,9 @@ namespace UDPT
 
         if (conf["apiserver.enable"].as<bool>())
         {
-            m_webApp = std::shared_ptr<UDPT::WebApp>(new WebApp(*m_udpTracker->m_conn));
+            const std::string& listenIp = conf["apiserver.iface"].as<std::string>();
+            const uint16_t listenPort = conf["apiserver.port"].as<uint16_t>();
+            m_webApp = std::shared_ptr<UDPT::WebApp>(new WebApp(*m_udpTracker->m_conn, listenIp, listenPort));
         }
 
         m_udpTracker->start();
@@ -98,8 +100,8 @@ namespace UDPT
             ("tracker.cleanup_interval", boost::program_options::value<unsigned>()->default_value(120), "sets database cleanup interval")
 
             ("apiserver.enable", boost::program_options::value<bool>()->default_value(0), "Enable API server?")
-            ("apiserver.threads", boost::program_options::value<unsigned short>()->default_value(1), "threads for API server")
-            ("apiserver.port", boost::program_options::value<unsigned short>()->default_value(6969), "TCP port to listen on")
+            ("apiserver.iface", boost::program_options::value<std::string>()->default_value("127.0.0.1"), "IP to listen on")
+            ("apiserver.port", boost::program_options::value<uint16_t>()->default_value(6969), "TCP port to listen on")
 
             ("logging.filename", boost::program_options::value<std::string>()->default_value("/var/log/udpt.log"), "file to write logs to")
             ("logging.level", boost::program_options::value<std::string>()->default_value("warning"), "log level (fatal/error/warning/info/debug)")

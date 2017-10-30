@@ -27,7 +27,11 @@
 
 
 namespace UDPT {
-    WebApp::WebApp(UDPT::Data::DatabaseDriver &db): m_db(db) {
+    WebApp::WebApp(UDPT::Data::DatabaseDriver &db,
+                   const std::string& listenIP,
+                   uint16_t listenPort): m_db(db),
+                                         m_listenIP(listenIP),
+                                         m_listenPort(listenPort) {
 
 #ifdef WIN32
         ::evthread_use_windows_threads();
@@ -49,10 +53,12 @@ namespace UDPT {
             throw std::exception();
         }
 
-        if (0 != ::evhttp_bind_socket(m_httpServer.get(), "127.0.0.1", 8080)) {
+        if (0 != ::evhttp_bind_socket(m_httpServer.get(), m_listenIP.c_str(), m_listenPort)) {
             LOG_ERR("webapp", "Failed to bind socket");
             throw std::exception();
         }
+
+        LOG_INFO("webapp", "HTTP server bound to " << m_listenIP.c_str() << ":" << m_listenPort);
 
         ::evhttp_set_allowed_methods(m_httpServer.get(), EVHTTP_REQ_GET | EVHTTP_REQ_POST | EVHTTP_REQ_DELETE);
 

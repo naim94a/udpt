@@ -28,7 +28,7 @@ namespace UDPT
 {
     class WebApp {
     public:
-        WebApp(UDPT::Data::DatabaseDriver& db);
+        WebApp(UDPT::Data::DatabaseDriver& db, const std::string& listenIP, uint16_t listenPort);
 
         virtual ~WebApp();
 
@@ -51,6 +51,9 @@ namespace UDPT
         static const std::string JSON_OKAY_DYNAMIC;
 
         UDPT::Data::DatabaseDriver& m_db;
+
+        const std::string m_listenIP;
+        uint16_t m_listenPort;
 
         std::thread m_workerThread;
         std::atomic_bool m_isRunning;
