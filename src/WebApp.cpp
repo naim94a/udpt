@@ -28,9 +28,14 @@
 
 namespace UDPT {
     WebApp::WebApp(UDPT::Data::DatabaseDriver &db): m_db(db) {
-        //TODO: check if platform is windows, add to CMakeLists
 
+#ifdef WIN32
+        ::evthread_use_windows_threads();
+#elif defined(__linux__) || defined(__FreeBSD__)
         ::evthread_use_pthreads();
+#else
+#error evthread threading required, no compatible library was found.
+#endif
 
         m_eventBase = std::shared_ptr<struct event_base>(::event_base_new(), ::event_base_free);
         if (nullptr == m_eventBase) {
