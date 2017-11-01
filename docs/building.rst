@@ -88,10 +88,10 @@ The provided ``docker-compose.yml`` file is configured to:
 * Mount your host's ``udpt.conf`` from your source tree inside the container at ``/etc/udpt.conf`` (read-only).
 * Start with the ``--interactive`` switch to avoid forking to background, as required with Docker.
 
-You need to:
+To run udpt inside a Docker container, you need to:
 
 * Configure logging to ``/dev/stdout`` to send the program's messages to Docker's standard logging.
-* Configure API server to listen to 0.0.0.0 inside the container to be able to contact it from your development host, that is from outside the container (see issue #36).
+* Configure API server to listen to 0.0.0.0 inside the container to be able to contact it from your development host, that is from outside the container.
 
 See the ``docker-compose.yml`` to view and tweak the launch parameters.
 
