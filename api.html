@@ -166,8 +166,8 @@ APIs should not be exposed directly to the internet, they are intended for inter
 </ul>
 </li>
 <li>
-<p>Preforming actions on torrents</p>
-<p><code>POST /t/&lt;info_hash&gt;&amp;action=&lt;action&gt;&amp;token=... HTTP/1.0</code></p>
+<p>Performing actions on torrents</p>
+<p><code>POST /t/&lt;info_hash&gt;?action=&lt;action&gt;&amp;token=... HTTP/1.0</code></p>
 <p>Valid actions are: <code>flag</code>, <code>unflag</code>, <code>add</code> &amp; <code>remove</code>.</p>
 <p><code>add</code> &amp; <code>remove</code> are only valid for non-dynamic tracking modes.</p>
 </li>
