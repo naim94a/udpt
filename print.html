@@ -1,9 +1,13 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js">
+<html lang="en" class="sidebar-visible no-js coal">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>UDPT v3</title>
+        
+        <meta name="robots" content="noindex" />
+        
+
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="UDPT v3 User Guide">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,11 +34,11 @@
 
         
     </head>
-    <body class="light">
+    <body>
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "coal" : "coal";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -56,10 +60,13 @@
         <!-- Set the theme before any content is loaded, prevents flash -->
         <script type="text/javascript">
             var theme;
-            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
-            document.body.className = theme;
-            document.querySelector('html').className = theme + ' js';
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('coal')
+            html.classList.add(theme);
+            html.classList.add('js');
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
@@ -75,58 +82,49 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <ol class="chapter"><li class="affix"><a href="index.html">UDPT</a></li><li><a href="build.html"><strong aria-hidden="true">1.</strong> Building</a></li><li><a href="config.html"><strong aria-hidden="true">2.</strong> Configuration</a></li><li><ol class="section"><li><a href="tracking_modes.html"><strong aria-hidden="true">2.1.</strong> Tracking Modes</a></li></ol></li><li><a href="usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><a href="api.html"><strong aria-hidden="true">4.</strong> REST API</a></li></ol>
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">UDPT</a></li><li class="chapter-item expanded "><a href="build.html"><strong aria-hidden="true">1.</strong> Building</a></li><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">2.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tracking_modes.html"><strong aria-hidden="true">2.1.</strong> Tracking Modes</a></li></ol></li><li class="chapter-item expanded "><a href="usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li class="chapter-item expanded "><a href="api.html"><strong aria-hidden="true">4.</strong> REST API</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
         <div id="page-wrapper" class="page-wrapper">
 
             <div class="page">
                 
-                <div id="menu-bar" class="menu-bar">
-                    <div id="menu-bar-sticky-container">
-                        <div class="left-buttons">
-                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
-                                <i class="fa fa-bars"></i>
-                            </button>
-                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
-                                <i class="fa fa-paint-brush"></i>
-                            </button>
-                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
-                            </ul>
-                            
-                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
-                                <i class="fa fa-search"></i>
-                            </button>
-                            
-                        </div>
-
-                        <h1 class="menu-title">UDPT v3</h1> 
-
-                        <div class="right-buttons">
-                            <a href="print.html" title="Print this book" aria-label="Print this book">
-                                <i id="print-button" class="fa fa-print"></i>
-                            </a>
-                            
-                        </div>
-                    </div>
-                </div>
-
-                
-                <div id="search-wrapper" class="hidden">
-                    <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
-                    </form>
-                    <div id="searchresults-outer" class="searchresults-outer hidden">
-                        <div id="searchresults-header" class="searchresults-header"></div>
-                        <ul id="searchresults">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
                         </ul>
+                        
+                    </div>
+
+                    <h1 class="menu-title">UDPT v3</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        <a href="https://github.com/naim94a/udpt" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
                     </div>
                 </div>
+
                 
 
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
@@ -140,15 +138,15 @@
 
                 <div id="content" class="content">
                     <main>
-                        <a class="header" href="#udpt" id="udpt"><h1>UDPT</h1></a>
+                        <h1><a class="header" href="#udpt" id="udpt">UDPT</a></h1>
 <ul>
 <li>Project Page: <a href="https://github.com/naim94a/udpt">github.com/naim94a/udpt</a></li>
 <li>Documentation: <a href="https://naim94a.github.io/udpt">naim94a.github.io/udpt</a></li>
 </ul>
-<p>UDPT is a lightweight torrent tracker that uses the UDP protocol for tracking and fully implements <a href="http://bittorrent.org/beps/bep_0015.html">BEP-15</a>.
+<p>UDPT is a lightweight torrent tracker that uses the UDP protocol for tracking and fully implements <a href="http://bittorrent.org/beps/bep_0015.html">BEP-15</a>. 
 This project was developed with security &amp; simplicity in mind, so it shouldn't be difficult to get a server started.</p>
 <p>Unlike most HTTP torrent-trackers, you can save about 50% bandwidth using a UDP tracker.</p>
-<a class="header" href="#features" id="features"><h2>Features</h2></a>
+<h2><a class="header" href="#features" id="features">Features</a></h2>
 <ul>
 <li>UDP tracking protocol</li>
 <li>Simple <a href="https://en.wikipedia.org/wiki/TOML">TOML</a> configuration</li>
@@ -159,62 +157,62 @@ This project was developed with security &amp; simplicity in mind, so it shouldn
 <li>Can be built/run on many platforms</li>
 <li>(Re)written in <a href="https://www.rust-lang.org/">Rust</a></li>
 </ul>
-<a class="header" href="#licenses" id="licenses"><h2>Licenses</h2></a>
+<h2><a class="header" href="#licenses" id="licenses">Licenses</a></h2>
 <p>UDPT available under the <a href="https://github.com/naim94a/udpt/blob/master/LICENSE">MIT license</a>.</p>
-<a class="header" href="#about" id="about"><h2>About</h2></a>
+<h2><a class="header" href="#about" id="about">About</a></h2>
 <p>Originally written in C++ by <a href="https://github.com/naim94a">@naim94a</a> in 2012 for fun.</p>
-<a class="header" href="#building-udpt" id="building-udpt"><h1>Building UDPT</h1></a>
+<h1><a class="header" href="#building-udpt" id="building-udpt">Building UDPT</a></h1>
 <p>If you're reading this, you're probably interested in using UDPT - so first, thanks for your interest!</p>
 <p>UDPT used to be harder to build, especially on Windows due to it's dependencies. Thanks to Rust, it's much simpler now.</p>
-<a class="header" href="#required-tools" id="required-tools"><h2>Required tools</h2></a>
+<h2><a class="header" href="#required-tools" id="required-tools">Required tools</a></h2>
 <ul>
 <li><a href="https://git-scm.com">Git</a> - Version Control</li>
 <li><a href="https://www.rust-lang.org/">Rust</a> - Compiler toolchain &amp; Package Manager (cargo)</li>
 </ul>
-<a class="header" href="#getting-the-sources" id="getting-the-sources"><h3>Getting the sources</h3></a>
+<h3><a class="header" href="#getting-the-sources" id="getting-the-sources">Getting the sources</a></h3>
 <pre><code>git clone https://github.com/naim94a/udpt.git
 </code></pre>
 <p>If you prefer to just download the code, you can get the <a href="https://github.com/naim94a/udpt/archive/master.zip">latest codebase here</a>.</p>
-<a class="header" href="#building" id="building"><h3>Building</h3></a>
-<p>This step will download all required dependencies (from <a href="https://crates.io/">crates.io</a>) and build them as well.</p>
+<h3><a class="header" href="#building" id="building">Building</a></h3>
+<p>This step will download all required dependencies (from <a href="https://crates.io/">crates.io</a>) and build them as well. </p>
 <p>Building should always be done with the latest Rust compiler.</p>
 <pre><code>cd udpt
 cargo build --release
 </code></pre>
 <p>Once cargo is done building, <code>udpt</code> will be built at <code>target/release/udpt</code>.</p>
-<a class="header" href="#running-tests" id="running-tests"><h3>Running Tests</h3></a>
+<h3><a class="header" href="#running-tests" id="running-tests">Running Tests</a></h3>
 <p>UDPT comes with unit tests, they can be run with the following command:</p>
 <pre><code>cargo test
 </code></pre>
 <p>If a build or test fails, please submit Issues to <a href="https://github.com/naim94a/udpt/issues">UDPT's issue tracker</a>.</p>
-<a class="header" href="#configuring-udpt" id="configuring-udpt"><h1>Configuring UDPT</h1></a>
+<h1><a class="header" href="#configuring-udpt" id="configuring-udpt">Configuring UDPT</a></h1>
 <p>UDPT's configuration is a simple TOML file.</p>
-<a class="header" href="#configuration" id="configuration"><h2>Configuration</h2></a>
+<h2><a class="header" href="#configuration" id="configuration">Configuration</a></h2>
 <p>At the root level, the following options are configurable:
 <code>mode</code> - Specifies which mode the tracker will operate in. Values can be <code>static</code>, <code>dynamic</code> or <code>private</code>.</p>
-<a class="header" href="#root-level" id="root-level"><h3>Root Level</h3></a>
+<h3><a class="header" href="#root-level" id="root-level">Root Level</a></h3>
 <ul>
 <li><code>mode</code> - Required. Possbile Values: <code>private</code>, <code>static</code> or <code>dynamic</code>.</li>
 <li><code>log_level</code> - Default: <code>info</code>. Possible Values: <code>off</code>, <code>error</code>, <code>warning</code>, <code>info</code>, <code>debug</code>, <code>trace</code>.</li>
 <li><code>db_path</code> - Database path. If not set, database will be volatile.</li>
 <li><code>cleanup_interval</code> - Default: 600. Interval to run cleanup in seconds. Cleanup also saves the Database.</li>
 </ul>
-<a class="header" href="#udp-section" id="udp-section"><h3><code>[udp]</code> section</h3></a>
+<h3><a class="header" href="#udp-section" id="udp-section"><code>[udp]</code> section</a></h3>
 <p>This section must exist.</p>
 <ul>
 <li><code>bind_address</code> - Required. This is where the UDP port will bind to. Example: <code>0.0.0.0:6969</code>.</li>
 <li><code>announce_interval</code> - Required. Sets the <code>announce_interval</code> that will be sent to peers (in seconds).</li>
 </ul>
-<a class="header" href="#http-section" id="http-section"><h3><code>[http]</code> section</h3></a>
+<h3><a class="header" href="#http-section" id="http-section"><code>[http]</code> section</a></h3>
 <p>This section is optional.</p>
 <ul>
 <li><code>bind_address</code> - Required (if section exists). The HTTP REST API will be bound to this address. It's best not to expose this address publically. Example: <code>127.0.0.1:1234</code>.</li>
 </ul>
-<a class="header" href="#httpaccess_tokens-section" id="httpaccess_tokens-section"><h3><code>[http.access_tokens]</code> section</h3></a>
+<h3><a class="header" href="#httpaccess_tokens-section" id="httpaccess_tokens-section"><code>[http.access_tokens]</code> section</a></h3>
 <p>Section is required if <code>[http]</code> section exists.</p>
 <p>In this section you can make up keys that would be user ids, and values that would be their access token.
 If this section is empty, the REST API will not be very useful.</p>
-<a class="header" href="#sample-configuration" id="sample-configuration"><h2>Sample Configuration</h2></a>
+<h2><a class="header" href="#sample-configuration" id="sample-configuration">Sample Configuration</a></h2>
 <pre><code class="language-toml">mode = &quot;dynamic&quot;
 db_path = &quot;database.json.bz2&quot;
 
@@ -228,63 +226,45 @@ bind_address = &quot;127.0.0.1:1212&quot;
 [http.access_tokens]
 someone = &quot;MyAccessToken&quot;
 </code></pre>
-<a class="header" href="#tracking-modes" id="tracking-modes"><h1>Tracking Modes</h1></a>
-<p>UDPT currently supports Static &amp; Dynamic tracking modes.
+<h1><a class="header" href="#tracking-modes" id="tracking-modes">Tracking Modes</a></h1>
+<p>UDPT currently supports Static &amp; Dynamic tracking modes. 
 Private tracking is planned, but isn't yet completely implemented.</p>
-<a class="header" href="#dynamic-mode" id="dynamic-mode"><h2>Dynamic Mode</h2></a>
+<h2><a class="header" href="#dynamic-mode" id="dynamic-mode">Dynamic Mode</a></h2>
 <p>In this mode a tracker allows any torrent, even if unknown to be tracked.
 Trackers that run in this mode usually don't know about the contents of the tracked torrent.
 In addition, trackers don't usually know anything about the peers.</p>
 <p>UDPT supports dynamic mode, and allows blacklisting torrents to avoid copyright infringement.
 Torrents can be blacklisted (or &quot;flagged&quot;) using the REST API.</p>
-<a class="header" href="#static-mode" id="static-mode"><h2>Static Mode</h2></a>
-<p>In static mode, anyone can use the tracker like in dynamic mode.
+<h2><a class="header" href="#static-mode" id="static-mode">Static Mode</a></h2>
+<p>In static mode, anyone can use the tracker like in dynamic mode. 
 Except that torrents must be registered ahead of time.</p>
 <p>UDPT supports static mode, and torrents can be added or removed using the REST API.</p>
-<a class="header" href="#private-mode" id="private-mode"><h2>Private Mode</h2></a>
+<h2><a class="header" href="#private-mode" id="private-mode">Private Mode</a></h2>
 <p>Private tracking requires all peers to be authenticated.
 Some implementations require torrents to be registered, and some do not.
 This mode can be either static or dynamic with peer authentication.</p>
 <p>UDPT doesn't currently implement private mode, although there are plans to implement private tracking in the future.</p>
-<a class="header" href="#usage" id="usage"><h1>Usage</h1></a>
+<h1><a class="header" href="#usage" id="usage">Usage</a></h1>
 <p>At the moment, <code>udpt</code> doesn't have many options. Once you've modified the configuration file, you could start <code>udpt</code>:</p>
 <pre><code>udpt -c configuration.toml </code></pre>
-<a class="header" href="#rest-api" id="rest-api"><h1>REST API</h1></a>
+<h1><a class="header" href="#rest-api" id="rest-api">REST API</a></h1>
 <p>The REST API can help you manage UDPT with your own scripts.</p>
 <p><strong><strong>Notice:</strong></strong>
-The API should only be used in trusted networks.
-APIs should not be exposed directly to the internet, they are intended for internal use only.</p>
-<a class="header" href="#endpoints" id="endpoints"><h2>Endpoints</h2></a>
+The API should only be used in trusted networks. 
+APIs should not be exposed directly to the internet, they are intended for internal use only. </p>
+<h2><a class="header" href="#endpoints" id="endpoints">Endpoints</a></h2>
 <p>All Endpoints require a authorization token which must be set in the configuration before running the tracker.</p>
-<ul>
-<li>
-<p>Listing Torrents</p>
-<p>This can be useful if you want to see which torrents are currently registered in any of the tracking modes.</p>
-<p><code>GET /t?offset=0&amp;limit=1000&amp;token=... HTTP/1.0</code></p>
-<p>Optional Parameters:</p>
-<ul>
-<li><code>offset</code> - Offset of the torrent list to return. Default: 0.</li>
-<li><code>limit</code> - Limit of torrents to output. Between 1 and 4096. Default 1000.</li>
-</ul>
-</li>
-<li>
-<p>Getting a torrent's stats</p>
-<p>Allows collection of stats from active torrents.</p>
-<p><code>GET /t/&lt;info_hash&gt;?token=... HTTP/1.0</code></p>
-<p>This request will return information about the torrent, such as:</p>
-<ul>
-<li>if the torrent is flagged</li>
-<li>seeders &amp; leechers</li>
-<li>times the torrent's download was completed</li>
-</ul>
-</li>
-<li>
-<p>Performing actions on torrents</p>
-<p><code>POST /t/&lt;info_hash&gt;?action=&lt;action&gt;&amp;token=... HTTP/1.0</code></p>
-<p>Valid actions are: <code>flag</code>, <code>unflag</code>, <code>add</code> &amp; <code>remove</code>.</p>
-<p><code>add</code> &amp; <code>remove</code> are only valid for non-dynamic tracking modes.</p>
-</li>
-</ul>
+<table><thead><tr><th>Method</th><th>Route</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>GET</code></td><td>/t</td><td>list all tracked torrents. Possible query parameters are: <br /> <em>offset</em> - The offset in the db where to start listing torrents from.<br /><em>limit</em> - Maximum amount of records to retrieve (max. 1000).</td></tr>
+<tr><td><code>GET</code></td><td>/t/<em>infohash</em></td><td>get information about a specific torrent: connected peers &amp; stats</td></tr>
+<tr><td><code>DELETE</code></td><td>/t/<em>infohash</em></td><td>drop a torrent from the database.</td></tr>
+<tr><td><code>POST</code></td><td>/t/<em>infohash</em></td><td>add/flag/unflag torrent</td></tr>
+</tbody></table>
+<p>The payload expected for adding a torrent can be empty, flagging or unflagging a torrent has the following payload:</p>
+<pre><code class="language-json">{
+    &quot;is_flagged&quot;: false
+}
+</code></pre>
 
                     </main>
 
@@ -329,11 +309,15 @@ APIs should not be exposed directly to the internet, they are intended for inter
         
 
         
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
 
         
-        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+
         
 
         <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
