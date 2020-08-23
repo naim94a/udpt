@@ -5,13 +5,24 @@
         <meta charset="UTF-8">
         <title>REST API - UDPT v3</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="UDPT v3 User Guide">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
         <link rel="shortcut icon" href="favicon.png">
+        
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
@@ -19,8 +30,9 @@
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -36,7 +48,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "coal" : "coal";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "coal";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -154,6 +166,27 @@ APIs should not be exposed directly to the internet, they are intended for inter
     &quot;is_flagged&quot;: false
 }
 </code></pre>
+<h2><a class="header" href="#examples" id="examples">Examples</a></h2>
+<p>Listing all tracked torrents</p>
+<pre><code class="language-bash">$ curl http://127.0.0.1:1212/t/?token=MyAccessToken
+[{&quot;info_hash&quot;:&quot;1234567890123456789012345678901234567890&quot;,&quot;is_flagged&quot;:true,&quot;completed&quot;:0,&quot;seeders&quot;:0,&quot;leechers&quot;:0}]
+</code></pre>
+<p>Getting information for a specific torrent</p>
+<pre><code class="language-bash">$ curl http://127.0.0.1:1212/t/1234567890123456789012345678901234567890?token=MyAccessToken
+{&quot;info_hash&quot;:&quot;1234567890123456789012345678901234567890&quot;,&quot;is_flagged&quot;:false,&quot;completed&quot;:0,&quot;seeders&quot;:0,&quot;leechers&quot;:1,&quot;peers&quot;:[[{&quot;id&quot;:&quot;2d7142343235302d3458295942396f5334af686b&quot;,&quot;client&quot;:&quot;qBittorrent&quot;},{&quot;ip&quot;:&quot;192.168.1.6:52391&quot;,&quot;uploaded&quot;:0,&quot;downloaded&quot;:0,&quot;left&quot;:0,&quot;event&quot;:&quot;Started&quot;,&quot;updated&quot;:672}]]}
+</code></pre>
+<p>Adding a torrent (non-dynamic trackers) or Unflagging a torrent:</p>
+<pre><code class="language-bash">$ curl -X POST http://127.0.0.1:1212/t/1234567890123456789012345678901234567890?token=MyAccessToken -d &quot;{\&quot;is_flagged\&quot;: false}&quot; -H &quot;Content-Type: application/json&quot;
+{&quot;status&quot;:&quot;ok&quot;}
+</code></pre>
+<p>Removing a torrent:</p>
+<pre><code class="language-bash">$ curl -X DELETE http://127.0.0.1:1212/t/1234567890123456789012345678901234567890?token=MyAccessToken
+{&quot;status&quot;:&quot;ok&quot;}
+</code></pre>
+<p>Flagging a torrent:</p>
+<pre><code class="language-bash">$ curl -X POST http://127.0.0.1:1212/t/1234567890123456789012345678901234567890?token=MyAccessToken -d &quot;{\&quot;is_flagged\&quot;: true}&quot; -H &quot;Content-Type: application/json&quot;
+{&quot;info_hash&quot;:&quot;1234567890123456789012345678901234567890&quot;,&quot;is_flagged&quot;:true,&quot;completed&quot;:0,&quot;seeders&quot;:0,&quot;leechers&quot;:0,&quot;peers&quot;:[]}
+</code></pre>
 
                     </main>
 
@@ -206,10 +239,10 @@ APIs should not be exposed directly to the internet, they are intended for inter
         
 
         
-        
+
         
         <script type="text/javascript">
-            window.playpen_copyable = true;
+            window.playground_copyable = true;
         </script>
         
 
