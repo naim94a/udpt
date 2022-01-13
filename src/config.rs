@@ -1,8 +1,6 @@
 pub use crate::tracker::TrackerMode;
 use serde::Deserialize;
-use std;
 use std::collections::HashMap;
-use toml;
 
 #[derive(Deserialize)]
 pub struct UDPConfig {
@@ -108,7 +106,7 @@ impl Default for Configuration {
     fn default() -> Configuration {
         Configuration {
             log_level: None,
-            mode: TrackerMode::DynamicMode,
+            mode: TrackerMode::Dynamic,
             udp: UDPConfig {
                 announce_interval: 120,
                 bind_address: String::from("0.0.0.0:6969"),

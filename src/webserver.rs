@@ -101,7 +101,7 @@ fn authenticate(tokens: HashMap<String, String>) -> impl Filter<Extract = (), Er
 pub fn build_server(
     tracker: Arc<TorrentTracker>, tokens: HashMap<String, String>,
 ) -> Server<impl Filter<Extract = impl Reply> + Clone + Send + Sync + 'static> {
-    let root = filters::path::end().map(|| view_root());
+    let root = filters::path::end().map(view_root);
 
     let t1 = tracker.clone();
     // view_torrent_list -> GET /t/?offset=:u32&limit=:u32 HTTP/1.1
@@ -159,7 +159,7 @@ pub fn build_server(
                 let peers: Vec<_> = info
                     .get_peers_iter()
                     .take(1000)
-                    .map(|(peer_id, peer_info)| (peer_id.clone(), peer_info.clone()))
+                    .map(|(&peer_id, peer_info)| (peer_id, peer_info.clone()))
                     .collect();
 
                 Ok(reply::json(&TorrentEntry {
@@ -196,7 +196,7 @@ pub fn build_server(
             }
         });
 
-    let t4 = tracker.clone();
+    let t4 = tracker;
     // add_torrent/alter: POST /t/:info_hash
     // (optional) BODY: json: {"is_flagged": boolean}
     let change_torrent = filters::method::post()

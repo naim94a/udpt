@@ -12,15 +12,15 @@ const TWO_HOURS: std::time::Duration = std::time::Duration::from_secs(3600 * 2);
 pub enum TrackerMode {
     /// In static mode torrents are tracked only if they were added ahead of time.
     #[serde(rename = "static")]
-    StaticMode,
+    Static,
 
     /// In dynamic mode, torrents are tracked being added ahead of time.
     #[serde(rename = "dynamic")]
-    DynamicMode,
+    Dynamic,
 
     /// Tracker will only serve authenticated peers.
     #[serde(rename = "private")]
-    PrivateMode,
+    Private,
 }
 
 #[derive(Clone, Serialize)]
@@ -38,7 +38,7 @@ fn ser_instant<S: serde::Serializer>(inst: &std::time::Instant, ser: S) -> Resul
     ser.serialize_u64(inst.elapsed().as_millis() as u64)
 }
 
-#[derive(Ord, PartialEq, Eq, Clone)]
+#[derive(Ord, PartialOrd, PartialEq, Eq, Clone)]
 pub struct InfoHash {
     info_hash: [u8; 20],
 }
@@ -64,24 +64,20 @@ impl std::str::FromStr for InfoHash {
     }
 }
 
-impl std::cmp::PartialOrd<InfoHash> for InfoHash {
-    fn partial_cmp(&self, other: &InfoHash) -> Option<std::cmp::Ordering> {
-        self.info_hash.partial_cmp(&other.info_hash)
-    }
-}
-
 impl std::convert::From<&[u8]> for InfoHash {
     fn from(data: &[u8]) -> InfoHash {
         assert_eq!(data.len(), 20);
         let mut ret = InfoHash { info_hash: [0u8; 20] };
         ret.info_hash.clone_from_slice(data);
-        return ret;
+        ret
     }
 }
 
-impl std::convert::Into<InfoHash> for [u8; 20] {
-    fn into(self) -> InfoHash {
-        InfoHash { info_hash: self }
+impl From<[u8; 20]> for InfoHash {
+    fn from(info_hash: [u8; 20]) -> Self {
+        InfoHash {
+            info_hash,
+        }
     }
 }
 
@@ -114,13 +110,13 @@ impl<'v> serde::de::Visitor<'v> for InfoHashVisitor {
 
         let mut res = InfoHash { info_hash: [0u8; 20] };
 
-        if let Err(_) = binascii::hex2bin(v.as_bytes(), &mut res.info_hash) {
+        if binascii::hex2bin(v.as_bytes(), &mut res.info_hash).is_err() {
             return Err(serde::de::Error::invalid_value(
                 serde::de::Unexpected::Str(v),
                 &"expected a hexadecimal string",
             ));
         } else {
-            return Ok(res);
+            Ok(res)
         }
     }
 }
@@ -414,11 +410,9 @@ impl TorrentTracker {
         match write_lock.entry(info_hash.clone()) {
             std::collections::btree_map::Entry::Vacant(ve) => {
                 ve.insert(TorrentEntry::new());
-                return Ok(());
-            }
-            std::collections::btree_map::Entry::Occupied(_entry) => {
-                return Err(());
-            }
+                Ok(())
+            },
+            std::collections::btree_map::Entry::Occupied(_entry) => Err(()),
         }
     }
 
@@ -430,16 +424,15 @@ impl TorrentTracker {
         match torrent_entry {
             Entry::Vacant(_) => {
                 // no entry, nothing to do...
-                return Err(());
             }
             Entry::Occupied(entry) => {
                 if force || !entry.get().is_flagged() {
                     entry.remove();
                     return Ok(());
                 }
-                return Err(());
             }
         }
+        Err(())
     }
 
     /// flagged torrents will result in a tracking error. This is to allow enforcement against piracy.
@@ -460,14 +453,9 @@ impl TorrentTracker {
         &self, info_hash: &InfoHash, remote_addr: &std::net::SocketAddr,
     ) -> Option<Vec<std::net::SocketAddr>> {
         let read_lock = self.database.torrent_peers.read().await;
-        match read_lock.get(info_hash) {
-            None => {
-                return None;
-            }
-            Some(entry) => {
-                return Some(entry.get_peers(remote_addr));
-            }
-        };
+        read_lock
+            .get(info_hash)
+            .map(|entry| entry.get_peers(remote_addr))
     }
 
     pub async fn update_torrent_and_get_stats(
@@ -479,7 +467,7 @@ impl TorrentTracker {
         let torrent_entry = match torrent_peers.entry(info_hash.clone()) {
             Entry::Vacant(vacant) => {
                 match self.mode {
-                    TrackerMode::DynamicMode => vacant.insert(TorrentEntry::new()),
+                    TrackerMode::Dynamic => vacant.insert(TorrentEntry::new()),
                     _ => {
                         return TorrentStats::TorrentNotRegistered;
                     }
@@ -497,14 +485,14 @@ impl TorrentTracker {
 
         let (seeders, complete, leechers) = torrent_entry.get_stats();
 
-        return TorrentStats::Stats {
+        TorrentStats::Stats {
             seeders,
             leechers,
             complete,
-        };
+        }
     }
 
-    pub(crate) async fn get_database<'a>(&'a self) -> tokio::sync::RwLockReadGuard<'a, BTreeMap<InfoHash, TorrentEntry>> {
+    pub(crate) async fn get_database(&self) -> tokio::sync::RwLockReadGuard<'_, BTreeMap<InfoHash, TorrentEntry>> {
         self.database.torrent_peers.read().await
     }
 
@@ -558,9 +546,9 @@ impl TorrentTracker {
                 }
             }
 
-            if self.mode == TrackerMode::DynamicMode {
+            if self.mode == TrackerMode::Dynamic {
                 // peer-less torrents..
-                if v.peers.len() == 0 && !v.is_flagged() {
+                if v.peers.is_empty() && !v.is_flagged() {
                     torrents_to_remove.push(k.clone());
                 }
             }
@@ -627,7 +615,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_save_db() {
-        let tracker = TorrentTracker::new(TrackerMode::DynamicMode);
+        let tracker = TorrentTracker::new(TrackerMode::Dynamic);
         tracker
             .add_torrent(&[0u8, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0].into())
             .await

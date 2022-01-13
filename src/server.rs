@@ -1,11 +1,9 @@
 use log::{debug, error, trace};
-use std;
 use std::io::Write;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::UdpSocket;
 
-use bincode;
 use serde::{Deserialize, Serialize};
 
 use crate::config::Configuration;
@@ -143,7 +141,6 @@ impl UDPTracker {
             _ => {
                 trace!("invalid action from {}", remote_address);
                 // someone is playing around... ignore request.
-                return;
             }
         }
     }
@@ -168,7 +165,7 @@ impl UDPTracker {
         let mut payload_buffer = vec![0u8; MAX_PACKET_SIZE];
         let mut payload = StackVec::from(payload_buffer.as_mut_slice());
 
-        if let Ok(_) = pack_into(&mut payload, &response) {
+        if pack_into(&mut payload, &response).is_ok() {
             let _ = self.send_packet(remote_addr, payload.as_slice()).await;
         }
     }
@@ -269,11 +266,9 @@ impl UDPTracker {
             }
             tracker::TorrentStats::TorrentFlagged => {
                 self.send_error(&client_addr, &packet.header, "torrent flagged.").await;
-                return;
             }
             tracker::TorrentStats::TorrentNotRegistered => {
                 self.send_error(&client_addr, &packet.header, "torrent not registered.").await;
-                return;
             }
         }
     }
@@ -346,7 +341,7 @@ impl UDPTracker {
         }
 
         // if sending fails, not much we can do...
-        let _ = self.send_packet(&remote_addr, &response.as_slice()).await;
+        let _ = self.send_packet(remote_addr, response.as_slice()).await;
     }
 
     fn get_connection_id(&self, remote_address: &SocketAddr) -> u64 {
@@ -370,10 +365,10 @@ impl UDPTracker {
         let mut payload_buffer = vec![0u8; MAX_PACKET_SIZE];
         let mut payload = StackVec::from(&mut payload_buffer);
 
-        if let Ok(_) = pack_into(&mut payload, &UDPResponseHeader {
+        if pack_into(&mut payload, &UDPResponseHeader {
             transaction_id: header.transaction_id,
             action: Actions::Error,
-        }) {
+        }).is_ok() {
             let msg_bytes = Vec::from(error_msg.as_bytes());
             payload.extend(msg_bytes);
 
@@ -424,7 +419,7 @@ mod tests {
                 println!("conn_id={}", x.action as u32);
             }
             None => {
-                assert!(false);
+                unreachable!();
             }
         }
     }

@@ -1,5 +1,3 @@
-use clap;
-use fern;
 use log::{error, info, trace, warn};
 
 mod config;
@@ -57,9 +55,9 @@ async fn main() {
         .author(env!("CARGO_PKG_AUTHORS"))
         .version(env!("CARGO_PKG_VERSION"))
         .arg(
-            clap::Arg::with_name("config")
+            clap::Arg::new("config")
                 .takes_value(true)
-                .short("-c")
+                .short('c')
                 .help("Configuration file to load.")
                 .required(true),
         );
