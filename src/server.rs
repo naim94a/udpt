@@ -35,8 +35,15 @@ pub enum Events {
     Stopped = 3,
 }
 
+fn bincode_config() -> impl bincode::Options {
+    bincode::options()
+        .with_big_endian()
+        .with_fixint_encoding()
+        .allow_trailing_bytes()
+}
+
 fn pack_into<T: Serialize, W: std::io::Write>(w: &mut W, data: &T) -> Result<(), ()> {
-    let config = bincode::options().with_big_endian().with_fixint_encoding();
+    let config = bincode_config();
 
     match config.serialize_into(w, data) {
         Ok(_) => Ok(()),
@@ -45,7 +52,7 @@ fn pack_into<T: Serialize, W: std::io::Write>(w: &mut W, data: &T) -> Result<(),
 }
 
 fn unpack<'a, T: Deserialize<'a>>(data: &'a [u8]) -> Option<T> {
-    let config = bincode::options().with_big_endian().allow_trailing_bytes();
+    let config = bincode_config();
 
     match config.deserialize(data) {
         Ok(obj) => Some(obj),
@@ -398,7 +405,7 @@ mod tests {
     #[test]
     fn pack() {
         let mystruct = super::UDPRequestHeader {
-            connection_id: 200,
+            connection_id: 0xc0c1c2c3c4c5c6c7,
             action: super::Actions::Connect,
             transaction_id: 77771,
         };
@@ -407,16 +414,16 @@ mod tests {
 
         assert!(pack_into(&mut payload, &mystruct).is_ok());
         assert_eq!(payload.as_slice().len(), 16);
-        assert_eq!(payload.as_slice(), &[0, 0, 0, 0, 0, 0, 0, 200u8, 0, 0, 0, 0, 0, 1, 47, 203]);
+        assert_eq!(payload.as_slice(), &[0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0, 0, 0, 0, 0, 1, 47, 203]);
     }
 
     #[test]
     fn unpack() {
-        let buf = [0u8, 0, 0, 0, 0, 0, 0, 200, 0, 0, 0, 1, 0, 1, 47, 203];
+        let buf = [0xc0u8, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0, 0, 0, 1, 0, 1, 47, 203];
         match super::unpack(&buf) {
             Some(obj) => {
-                let x: super::UDPResponseHeader = obj;
-                println!("conn_id={}", x.action as u32);
+                let x: super::UDPRequestHeader = obj;
+                assert_eq!(x.connection_id, 0xc0c1c2c3c4c5c6c7);
             }
             None => {
                 unreachable!();
