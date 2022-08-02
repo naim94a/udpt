@@ -7,4 +7,5 @@ WORKDIR /usr/src/udpt
 
 RUN cargo build --release ${BUILD_ARGS}
 
-CMD ["target/release/udpt-rs", "-c", "/usr/src/udpt/udpt.toml"]
+ENTRYPOINT [ "target/release/udpt-rs" ]
+CMD [ "-c", "/usr/src/udpt/udpt.toml" ]
