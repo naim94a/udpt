@@ -1,3 +1,4 @@
+use clap::ValueHint;
 use log::{error, info, trace, warn};
 
 mod config;
@@ -50,20 +51,20 @@ fn setup_logging(cfg: &Configuration) {
 
 #[tokio::main]
 async fn main() {
-    let parser = clap::App::new(env!("CARGO_PKG_NAME"))
+    let parser = clap::Command::new(env!("CARGO_PKG_NAME"))
         .about(env!("CARGO_PKG_DESCRIPTION"))
         .author(env!("CARGO_PKG_AUTHORS"))
         .version(env!("CARGO_PKG_VERSION"))
         .arg(
             clap::Arg::new("config")
-                .takes_value(true)
                 .short('c')
+                .value_hint(ValueHint::FilePath)
                 .help("Configuration file to load.")
                 .required(true),
         );
 
     let matches = parser.get_matches();
-    let cfg_path = matches.value_of("config").unwrap();
+    let cfg_path = matches.get_one::<String>("config").unwrap();
 
     let cfg = match Configuration::load_file(cfg_path) {
         Ok(v) => std::sync::Arc::new(v),

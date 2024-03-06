@@ -363,7 +363,7 @@ impl UDPTracker {
             Err(err) => {
                 debug!("failed to send a packet: {}", err);
                 Err(err)
-            },
+            }
             Ok(sz) => Ok(sz),
         }
     }
@@ -375,7 +375,9 @@ impl UDPTracker {
         if pack_into(&mut payload, &UDPResponseHeader {
             transaction_id: header.transaction_id,
             action: Actions::Error,
-        }).is_ok() {
+        })
+        .is_ok()
+        {
             let msg_bytes = Vec::from(error_msg.as_bytes());
             payload.extend(msg_bytes);
 
@@ -414,7 +416,9 @@ mod tests {
 
         assert!(pack_into(&mut payload, &mystruct).is_ok());
         assert_eq!(payload.as_slice().len(), 16);
-        assert_eq!(payload.as_slice(), &[0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0, 0, 0, 0, 0, 1, 47, 203]);
+        assert_eq!(payload.as_slice(), &[
+            0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0, 0, 0, 0, 0, 1, 47, 203
+        ]);
     }
 
     #[test]

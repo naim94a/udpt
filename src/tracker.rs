@@ -75,9 +75,7 @@ impl std::convert::From<&[u8]> for InfoHash {
 
 impl From<[u8; 20]> for InfoHash {
     fn from(info_hash: [u8; 20]) -> Self {
-        InfoHash {
-            info_hash,
-        }
+        InfoHash { info_hash }
     }
 }
 
@@ -383,7 +381,7 @@ impl TorrentTracker {
                 Err(ref err) => {
                     error!("failed to read lines! {}", err);
                     continue;
-                },
+                }
             };
             let row: DatabaseRow = match serde_json::from_str(&line) {
                 Ok(v) => v,
@@ -411,7 +409,7 @@ impl TorrentTracker {
             std::collections::btree_map::Entry::Vacant(ve) => {
                 ve.insert(TorrentEntry::new());
                 Ok(())
-            },
+            }
             std::collections::btree_map::Entry::Occupied(_entry) => Err(()),
         }
     }
@@ -453,9 +451,7 @@ impl TorrentTracker {
         &self, info_hash: &InfoHash, remote_addr: &std::net::SocketAddr,
     ) -> Option<Vec<std::net::SocketAddr>> {
         let read_lock = self.database.torrent_peers.read().await;
-        read_lock
-            .get(info_hash)
-            .map(|entry| entry.get_peers(remote_addr))
+        read_lock.get(info_hash).map(|entry| entry.get_peers(remote_addr))
     }
 
     pub async fn update_torrent_and_get_stats(
@@ -503,7 +499,7 @@ impl TorrentTracker {
 
         let db_lock = self.database.torrent_peers.read().await;
 
-        let db: &BTreeMap<InfoHash, TorrentEntry> = &*db_lock;
+        let db: &BTreeMap<InfoHash, TorrentEntry> = &db_lock;
         let mut tmp = Vec::with_capacity(4096);
 
         for row in db {
@@ -525,7 +521,7 @@ impl TorrentTracker {
 
     async fn cleanup(&self) {
         let mut lock = self.database.torrent_peers.write().await;
-        let db: &mut BTreeMap<InfoHash, TorrentEntry> = &mut *lock;
+        let db: &mut BTreeMap<InfoHash, TorrentEntry> = &mut lock;
         let mut torrents_to_remove = Vec::new();
 
         for (k, v) in db.iter_mut() {

@@ -61,15 +61,15 @@ impl std::fmt::Display for ConfigError {
 impl std::error::Error for ConfigError {}
 
 impl Configuration {
-    pub fn load(data: &[u8]) -> Result<Configuration, toml::de::Error> {
-        toml::from_slice(data)
+    pub fn load(data: &str) -> Result<Configuration, toml::de::Error> {
+        toml::from_str(data)
     }
 
     pub fn load_file(path: &str) -> Result<Configuration, ConfigError> {
-        match std::fs::read(path) {
+        match std::fs::read_to_string(path) {
             Err(e) => Err(ConfigError::IOError(e)),
             Ok(data) => {
-                match Self::load(data.as_slice()) {
+                match Self::load(&data) {
                     Ok(cfg) => Ok(cfg),
                     Err(e) => Err(ConfigError::ParseError(e)),
                 }

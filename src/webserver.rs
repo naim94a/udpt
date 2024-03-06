@@ -77,7 +77,7 @@ fn authenticate(tokens: HashMap<String, String>) -> impl Filter<Extract = (), Er
         token: Option<String>,
     }
 
-    let tokens: HashSet<String> = tokens.into_iter().map(|(_, v)| v).collect();
+    let tokens: HashSet<String> = tokens.into_values().collect();
 
     let tokens = Arc::new(tokens);
     warp::filters::any::any()
